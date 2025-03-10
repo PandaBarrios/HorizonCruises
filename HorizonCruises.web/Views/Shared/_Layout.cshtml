@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Horizon Cruises</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* Estilo para mantener el footer en la parte inferior */
+        html, body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding-bottom: 60px;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        footer {
+            background: #003366;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed; /* 🔥 Mantiene el footer en la parte inferior */
+            bottom: 0; /* 🔥 Se queda pegado abajo */
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* 🔥 Asegura que esté sobre otros elementos */
+        }
+
+        /* Estilos del Navbar */
+        .navbar {
+            background: linear-gradient(to right, #007bff, #00aaff);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .navbar-nav .nav-link {
+            font-size: 1.2rem;
+            color: white !important;
+            transition: 0.3s;
+        }
+
+            .navbar-nav .nav-link:hover {
+                color: #ffdd57 !important;
+            }
+
+        /* Banner Principal */
+        .hero-section {
+            background: url('/images/cruise-banner.jpg') center/cover no-repeat;
+            background-size: cover;
+            height: 70vh; /* Ajustamos la altura para hacerlo más compacto */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 0 15px;
+        }
+
+        footer a {
+            color: #ffdd57;
+            text-decoration: none;
+        }
+
+            footer a:hover {
+                text-decoration: underline;
+            }
+
+        .btn-lg {
+            padding: 10px 30px;
+            font-size: 1.2rem;
+        }
+
+        /* Testimonios */
+        .testimonial {
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            font-style: italic;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .testimonial:hover {
+                transform: translateY(-10px);
+            }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand text-white" asp-controller="Home" asp-action="Index">Horizon Cruises</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Reserva" asp-action="IndexReserva">Reservar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Barco" asp-action="Index">Barcos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Habitacion" asp-action="Index">Habitaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal -->
+    <div class="container mt-4">
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto">
+        <div class="container">
+            &copy; 2025 - Horizon Cruises
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+
+
+

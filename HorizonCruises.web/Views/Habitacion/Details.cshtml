@@ -1,0 +1,65 @@
+﻿@model HorizonCruises.Application.DTOs.HabitacionDTO
+
+@{
+    ViewData["Title"] = "Detalles de la Habitación";
+}
+
+<div class="container mt-4 pb-5">
+    <div class="card shadow-lg rounded">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">Detalles de la Habitación</h3>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4 text-secondary fw-bold">
+                    @Html.DisplayNameFor(model => model.Nombre)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Nombre)
+                </dd>
+
+                <dt class="col-sm-4 text-secondary fw-bold">
+                    @Html.DisplayNameFor(model => model.Descripcion)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Descripcion)
+                </dd>
+
+                <dt class="col-sm-4 text-secondary fw-bold">
+                    @Html.DisplayNameFor(model => model.CantidadMinimaHuespedes)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CantidadMinimaHuespedes)
+                </dd>
+
+                <dt class="col-sm-4 text-secondary fw-bold">
+                    @Html.DisplayNameFor(model => model.CantidadMaximaHuespedes)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.CantidadMaximaHuespedes)
+                </dd>
+
+                <dt class="col-sm-4 text-secondary fw-bold">
+                    @Html.DisplayNameFor(model => model.Tamano)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Tamano)
+                </dd>
+
+                <dt class="col-sm-4 text-secondary fw-bold">
+                    @Html.DisplayNameFor(model => model.Tipo)
+                </dt>
+                <dd class="col-sm-8">
+                    @Html.DisplayFor(model => model.Tipo)
+                </dd>
+            </dl>
+        </div>
+        <div class="card-footer text-center">
+            <div class="btn-group">
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-return-left"></i> Regresar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

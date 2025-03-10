@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Horizon Cruises - Bienvenido";
+}
+
+<div class="container-fluid p-0">
+    <!-- Imagen grande centrada en el centro de la página -->
+    <div class="hero-image" style="position: relative; height: 100vh; background: url('/images/cruise-icon.jpg') center/cover no-repeat;">
+        <!-- Contenido centrado en la imagen -->
+        <div class="d-flex justify-content-center align-items-center" style="height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+            <div class="text-center text-white">
+                <h1 class="display-3 fw-bold">Explora el Mundo con Horizon Cruises</h1>
+                <a href="@Url.Action("CruceroIndex", "Crucero")" class="btn btn-primary btn-lg mt-3">Explorar Cruceros</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonios -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Lo Que Dicen Nuestros Clientes</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="testimonial text-center p-4 shadow-sm rounded bg-white">
+                        <p>“Una experiencia increíble. Volveremos el próximo año.”</p>
+                        <strong>- Andrea M.</strong>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial text-center p-4 shadow-sm rounded bg-white">
+                        <p>“El servicio fue excelente y los destinos espectaculares.”</p>
+                        <strong>- Carlos R.</strong>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial text-center p-4 shadow-sm rounded bg-white">
+                        <p>“Recomiendo Horizon Cruises, superó nuestras expectativas.”</p>
+                        <strong>- Mariana L.</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+

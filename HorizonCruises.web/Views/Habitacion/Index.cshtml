@@ -1,0 +1,51 @@
+﻿@model IEnumerable<HorizonCruises.Application.DTOs.HabitacionDTO>
+
+@{
+    ViewData["Title"] = "Lista de Habitaciones";
+}
+
+<h1 class="text-center mb-4">Lista de Habitaciones</h1>
+
+<section>
+    <div class="container">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-12 mb-4">
+                    <div class="card shadow-lg rounded-4 border-0 d-flex flex-row align-items-center p-3"
+                         style="background: #f8f9fa; box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);">
+                        <div class="card-body d-flex flex-column justify-content-between ms-4">
+                            <h5 class="card-title text-primary fw-bold">@Html.DisplayFor(modelItem => item.Nombre)</h5>
+                            <p class="card-text text-muted">
+                                <i class="bi bi-info-circle"></i> <strong>Descripción:</strong> @Html.DisplayFor(modelItem => item.Descripcion)
+                            </p>
+                            <p class="card-text text-secondary">
+                                <i class="bi bi-arrows-angle-expand"></i> <strong>Tamaño:</strong> @Html.DisplayFor(modelItem => item.Tamano)
+                            </p>
+                            <p class="card-text text-secondary">
+                                <i class="bi bi-tags"></i> <strong>Tipo:</strong> @Html.DisplayFor(modelItem => item.Tipo)
+                            </p>
+                            <div class="text-end mt-3">
+                                <a class="btn btn-outline-primary px-4" asp-action="Details" asp-route-id="@item.Id">
+                                    <i class="bi bi-eye"></i> Ver Detalles
+                                </a>
+                                @* <a class="btn btn-outline-warning px-4" asp-action="Edit" asp-route-id="@item.Id">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a class="btn btn-outline-danger px-4" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('¿Estás seguro de eliminar esta habitación?');">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a> *@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@* <p class="text-center mt-4">
+    <a class="btn btn-success btn-lg" asp-action="Create">
+        <i class="bi bi-plus-lg"></i> Agregar Nueva Habitación
+    </a>
+</p> *@

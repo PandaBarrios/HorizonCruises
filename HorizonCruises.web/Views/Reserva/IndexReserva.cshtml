@@ -1,0 +1,42 @@
+﻿@model IEnumerable<HorizonCruises.Application.DTOs.ReservaDTO>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1 class="mb-4">Lista de Reservas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear Nueva Reserva</a>
+</p>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.IdUsuario)</th>
+            <th>@Html.DisplayNameFor(model => model.IdCrucero)</th>
+            <th>@Html.DisplayNameFor(model => model.Total)</th>
+            <th>@Html.DisplayNameFor(model => model.Saldopendiente)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.IdUsuarioNavigation.Nombre)</td>
+                <td>@Html.DisplayFor(modelItem => item.IdCruceroNavigation.Nombre)</td>
+                <td>@Html.DisplayFor(modelItem => item.Total)</td>
+                <td>
+                    <span class="badge @(item.Estado ? "bg-success" : "bg-warning")">
+                        @(item.Estado ? "Pagado" : "Pendiente")
+                    </span>
+                </td>
+                <td>
+                    <a asp-action="DetailsReserva" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Detalle</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

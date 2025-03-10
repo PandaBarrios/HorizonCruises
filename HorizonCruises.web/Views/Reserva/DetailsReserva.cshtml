@@ -1,0 +1,85 @@
+﻿@model HorizonCruises.Application.DTOs.ReservaDTO
+
+@{
+    ViewData["Title"] = "Factura de Reserva";
+}
+
+<h1 class="text-center">Factura de Reserva</h1>
+<hr />
+
+<div class="container border p-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Detalles de la Reserva</h4>
+            <p><strong>Crucero:</strong> @Model.IdCruceroNavigation.Nombre</p>
+            <p><strong>Puerto de Salida:</strong> @Model.IdCruceroNavigation.Itinerario.First().IdPuertoNavigation.Nombre</p>
+            <p><strong>Puerto de Regreso:</strong> @Model.IdCruceroNavigation.Itinerario.Last().IdPuertoNavigation.Nombre</p>
+            <p><strong>Fecha de Inicio:</strong> @Model.IdCruceroNavigation.FechaCrucero</p>
+            @* <p><strong>Fecha de Regreso:</strong> @(Model.IdCruceroNavigation.FechaCrucero.AddDays(Model.IdCruceroNavigation.Itinerario.Count - 1))</p> *@
+        </div>
+        <div class="col-md-6 text-right">
+            <h4>Estado de Pago</h4>
+            <p><strong>Estado:</strong> @(Model.Saldopendiente > 0 ? "Pendiente" : "Pagado")</p>
+            @if (Model.Saldopendiente > 0)
+            {
+                <p><strong>Saldo Pendiente:</strong> @Model.Saldopendiente $</p>
+                <p>
+                    <strong>Fecha Límite de Pago:</strong> @(Model.IdCruceroNavigation.FechaCrucero)
+                </p>
+            }
+        </div>
+    </div>
+
+    <hr />
+    <h4>Habitaciones</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Habitación</th>
+                <th>Cantidad de Huéspedes</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hab in Model.ReservaHabitacion)
+            {
+                <tr>
+                    <td>@hab.IdHabitacionNavigation.Nombre</td>
+                    <td>@hab.CantidadPasajerosHabitacion</td>
+                    <td>@hab.IdHabitacionNavigation.PrecioHabitacion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Complementos</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Complemento</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+          @*   @foreach (var comp in Model.ReservaComplemento)
+            {
+                <tr>
+                    <td>@comp.IdComplementoNavigation.Nombre</td>
+                    <td>@comp.Cantidad</td>
+                    <td>@(comp.Cantidad * comp.IdComplementoNavigation.Precio)</td> 
+                </tr>
+            } *@
+        </tbody>
+    </table>
+
+    <hr />
+    <h4>Resumen</h4>
+    <p><strong>Subtotal:</strong> @Model.SubTotal.ToString("C")</p>
+    <p><strong>Impuestos y Tarifas:</strong> @Model.Iva.ToString("C")</p>
+    <p><strong>Total:</strong> @Model.Total.ToString("C")</p>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>
