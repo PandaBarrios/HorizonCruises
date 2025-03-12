@@ -1,7 +1,9 @@
 ﻿@model HorizonCruises.Application.DTOs.ReservaDTO
 
 @{
+
     ViewData["Title"] = "Factura de Reserva";
+
 }
 
 <h1 class="text-center">Factura de Reserva</h1>
@@ -14,8 +16,8 @@
             <p><strong>Crucero:</strong> @Model.IdCruceroNavigation.Nombre</p>
             <p><strong>Puerto de Salida:</strong> @Model.IdCruceroNavigation.Itinerario.First().IdPuertoNavigation.Nombre</p>
             <p><strong>Puerto de Regreso:</strong> @Model.IdCruceroNavigation.Itinerario.Last().IdPuertoNavigation.Nombre</p>
-            <p><strong>Fecha de Inicio:</strong> @Model.IdCruceroNavigation.FechaCrucero</p>
-            @* <p><strong>Fecha de Regreso:</strong> @(Model.IdCruceroNavigation.FechaCrucero.AddDays(Model.IdCruceroNavigation.Itinerario.Count - 1))</p> *@
+            <p><strong>El viaje Inicia:</strong> @Model.IdCruceroNavigation.FechaCrucero[0].FechaInicio</p> 
+            <p><strong>Fecha de Regreso:</strong> @(Model.IdCruceroNavigation.FechaCrucero[0].FechaInicio.AddDays(Model.IdCruceroNavigation.CantidadDias))</p>
         </div>
         <div class="col-md-6 text-right">
             <h4>Estado de Pago</h4>
@@ -24,7 +26,7 @@
             {
                 <p><strong>Saldo Pendiente:</strong> @Model.Saldopendiente $</p>
                 <p>
-                    <strong>Fecha Límite de Pago:</strong> @(Model.IdCruceroNavigation.FechaCrucero)
+                    <strong>Fecha Límite de Pago:</strong> @(Model.IdCruceroNavigation.FechaCrucero[0].FechaLimitePago)
                 </p>
             }
         </div>
@@ -43,13 +45,17 @@
         <tbody>
             @foreach (var hab in Model.ReservaHabitacion)
             {
+                var precio = hab.IdHabitacionNavigation.PrecioHabitacion
+                .FirstOrDefault(p => p.IdHabitacion == hab.IdHabitacionNavigation.Id)?.PrecioHabitacion1 ?? 0;
+
                 <tr>
                     <td>@hab.IdHabitacionNavigation.Nombre</td>
                     <td>@hab.CantidadPasajerosHabitacion</td>
-                    <td>@hab.IdHabitacionNavigation.PrecioHabitacion</td>
+                    <td>@precio</td>
                 </tr>
             }
         </tbody>
+
     </table>
 
     <h4>Complementos</h4>
@@ -58,18 +64,22 @@
             <tr>
                 <th>Complemento</th>
                 <th>Cantidad</th>
+                <th>Precio Unidad</th>
                 <th>Total</th>
             </tr>
         </thead>
         <tbody>
-          @*   @foreach (var comp in Model.ReservaComplemento)
+           @foreach (var comp in Model.ReservaComplemento)
             {
+                var precio = comp.Cantidad * comp.IdComplementoNavigation.Precio;
                 <tr>
                     <td>@comp.IdComplementoNavigation.Nombre</td>
                     <td>@comp.Cantidad</td>
-                    <td>@(comp.Cantidad * comp.IdComplementoNavigation.Precio)</td> 
+                    <td>@comp.IdComplementoNavigation.Precio</td>
+                    <td>@precio</td>
+
                 </tr>
-            } *@
+            }
         </tbody>
     </table>
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using HorizonCruises.Application.DTOs;
+using HorizonCruises.Infraestructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace HorizonCruises.Application.Profiles
     {
         public ComplementoProfile()
         {
-            CreateMap<ComplementoDTO, ComplementoDTO>().ReverseMap();
+            CreateMap<ComplementoDTO, Complemento>().ReverseMap();
         }
     }
 }

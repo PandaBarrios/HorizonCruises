@@ -22,6 +22,8 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
         public async Task<Reserva> FindByIdAsync(int id)
         {
             var reserva = await _context.Reserva
+                .Include(x => x.ReservaComplemento)
+                    .ThenInclude(x => x.IdComplementoNavigation)
                 .Include(x => x.IdCruceroNavigation)
                     .ThenInclude(x => x.Itinerario.OrderBy(i => i.Orden))
                         .ThenInclude(x => x.IdPuertoNavigation)
@@ -31,6 +33,7 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                     .ThenInclude(x => x.IdHabitacionNavigation)
                         .ThenInclude(x => x.PrecioHabitacion)
                 .FirstOrDefaultAsync(x => x.Id == id);
+                
 
             return reserva!;
         }
