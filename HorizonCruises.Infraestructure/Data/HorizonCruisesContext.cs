@@ -215,25 +215,27 @@ public partial class HorizonCruisesContext : DbContext
 
         modelBuilder.Entity<PrecioHabitacion>(entity =>
         {
-            entity.HasKey(e => new { e.IdCruceroFecha, e.IdHabitacion });
+            entity.HasKey(e => e.Id).HasName("PK_Precio_Habitacion_1");
 
             entity.ToTable("Precio_Habitacion");
 
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.FechaLimitePrecio).HasColumnName("fecha_limite_precio");
             entity.Property(e => e.IdCruceroFecha).HasColumnName("id_crucero_fecha");
             entity.Property(e => e.IdHabitacion).HasColumnName("id_habitacion");
             entity.Property(e => e.PrecioHabitacion1)
-                .HasColumnType("decimal(10, 2)")
+                .HasColumnType("decimal(18, 0)")
                 .HasColumnName("precio_habitacion");
 
             entity.HasOne(d => d.IdCruceroFechaNavigation).WithMany(p => p.PrecioHabitacion)
                 .HasForeignKey(d => d.IdCruceroFecha)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Precio_Ha__id_cr__0E6E26BF");
+                .HasConstraintName("FK_Precio_Habitacion_Fecha_Crucero");
 
             entity.HasOne(d => d.IdHabitacionNavigation).WithMany(p => p.PrecioHabitacion)
                 .HasForeignKey(d => d.IdHabitacion)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Precio_Ha__id_ha__0F624AF8");
+                .HasConstraintName("FK_Precio_Habitacion_Habitacion");
         });
 
         modelBuilder.Entity<Puerto>(entity =>

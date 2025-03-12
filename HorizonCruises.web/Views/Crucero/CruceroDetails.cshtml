@@ -61,7 +61,7 @@
                     @if (Model.FechaCrucero != null && Model.FechaCrucero.Any())
                     {
 
-                        
+
                         decimal Descuento2 = 0.20m;
                         decimal Descuento1 = 0.50m;
                         decimal Total = 0m;
@@ -69,7 +69,7 @@
                         <!--Un dos meses antes-->
                         @foreach (var fecha in Model.FechaCrucero)
                         {
-                           
+
                             <div class="mb-3">
                                 <h5>Precios dos meses antes del viaje: @fecha.FechaLimitePago.AddDays(-60)</h5>
                                 @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
@@ -84,12 +84,14 @@
                                         <tbody>
                                             @foreach (var precio in fecha.PrecioHabitacion)
                                             {
-                                                Total = (precio.PrecioHabitacion1 ?? 0) * Descuento1;
-                                                Total = (precio.PrecioHabitacion1 ?? 0) - Total;
-                                                <tr>
-                                                    <td>@precio.IdHabitacionNavigation.Nombre</td>
-                                                    <td>@Total.ToString("F2") $</td>
-                                                </tr>
+                                                @if(precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-59))
+                                                {
+                                                    <tr>
+                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
+                                                        <td>₡ @precio.PrecioHabitacion1.ToString()</td>
+                                                    </tr>
+                                                }
+                                                
                                             }
                                         </tbody>
                                     </table>
@@ -120,12 +122,13 @@
                                         <tbody>
                                             @foreach (var precio in fecha.PrecioHabitacion)
                                             {
-                                                Total = (precio.PrecioHabitacion1 ?? 0) * Descuento2;
-                                                Total = (precio.PrecioHabitacion1 ?? 0) - Total;
-                                                <tr>
-                                                    <td>@precio.IdHabitacionNavigation.Nombre</td>
-                                                    <td>@Total.ToString("F2") $</td>
-                                                </tr>
+                                                @if (precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-29) && precio.FechaLimitePrecio > fecha.FechaLimitePago.AddDays(-59))
+                                                {
+                                                    <tr>
+                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
+                                                        <td>₡ @precio.PrecioHabitacion1.ToString()</td>
+                                                    </tr>
+                                                }
                                             }
                                         </tbody>
                                     </table>
@@ -156,10 +159,13 @@
                                         <tbody>
                                             @foreach (var precio in fecha.PrecioHabitacion)
                                             {
-                                                <tr>
-                                                    <td>@precio.IdHabitacionNavigation.Nombre</td>
-                                                    <td>@precio.PrecioHabitacion1 $</td>
-                                                </tr>
+                                                @if (precio.FechaLimitePrecio == fecha.FechaLimitePago)
+                                                {
+                                                    <tr>
+                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
+                                                        <td>₡ @precio.PrecioHabitacion1</td>
+                                                    </tr>
+                                                }
                                             }
                                         </tbody>
                                     </table>
