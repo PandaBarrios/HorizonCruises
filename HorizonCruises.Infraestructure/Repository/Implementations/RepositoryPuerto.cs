@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HorizonCruises.Infraestructure.Repository.Implementations
 {
@@ -33,6 +34,14 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             //Select * from Puerto 
             var collection = await _context.Set<Puerto>().ToListAsync();
             return collection;
+        }
+
+        public async Task<ICollection<Puerto>> FindByNameAsync(string nombre)
+        {
+            return await _context
+                .Set<Puerto>()
+                .Where(p => p.Nombre.Contains(nombre.ToLower())) // Busqueda ignorando mayusculas y minusculas
+                .ToListAsync();
         }
     }
 }

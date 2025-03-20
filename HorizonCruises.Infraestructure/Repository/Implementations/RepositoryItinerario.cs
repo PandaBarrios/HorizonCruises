@@ -17,11 +17,36 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
         {
             _context = context;
         }
-        public async Task<ICollection<Itinerario>> CruceroItinerario(int id)
+
+        public async Task<Itinerario> CreateAsync(Itinerario nItinerario)
         {
-            return await _context.Itinerario
-                                 .Where(i => i.IdCrucero == id)
-                                 .ToListAsync();
+            if (nItinerario == null)
+            {
+                throw new ArgumentNullException(nameof(nItinerario), "El objeto Crucero no puede ser nulo.");
+            }
+
+            // Agregar el itinerario
+            var entityEntry = await _context.Set<Itinerario>().AddAsync(nItinerario);
+            await _context.SaveChangesAsync();
+
+            // Retornar el crucero con su Id actualizado
+            return entityEntry.Entity;
+        }
+
+        public async Task<Itinerario> FindByIdAsync(int id)
+        {
+            var @object = await _context.Set<Itinerario>()
+                               .Where(x => x.IdCrucero == id)
+                               .Include(b => b.IdPuertoNavigation)
+                               .ThenInclude(bh => bh.IdDestinoNavigation)
+                               .FirstAsync();
+            return @object!;
+        }
+
+        public async Task<ICollection<Itinerario>> ListAsync()
+        {
+            var collection = await _context.Set<Itinerario>().ToListAsync();
+            return collection;
         }
     }
 }

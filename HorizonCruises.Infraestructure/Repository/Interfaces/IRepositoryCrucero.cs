@@ -11,5 +11,6 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
     {
         Task<ICollection<Crucero>> ListAsync();
         Task<Crucero> FindByIdAsync(int id);
+        Task<Crucero> CreateAsync(Crucero crucero);
     }
 }

@@ -13,6 +13,7 @@ namespace HorizonCruises.Application.DTOs
         public int Id { get; set; }
 
         public string Nombre { get; set; } = null!;
+
         [Display(Name = "Destino")]
         public string Pais { get; set; } = null!;
 

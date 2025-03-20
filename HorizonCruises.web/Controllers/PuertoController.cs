@@ -17,5 +17,13 @@ namespace HorizonCruises.web.Controllers
             var collection = await _servicePurto.ListAsync();
             return View(collection);
         }
+
+        public async Task<IActionResult> GetPuertoByName(string filtro)
+        {
+            var collection = await _servicePurto.FindByNameAsync(filtro);
+            return Json(collection);
+        }
+
+
     }
 }

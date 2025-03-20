@@ -1,0 +1,202 @@
+﻿@using System.Text.Json
+@using HorizonCruises.Application.DTOs
+@model HorizonCruises.Application.DTOs.CruceroDTO
+
+@{
+    ViewData["Title"] = "Crear Crucero";
+}
+
+<h1 class="mb-4 text-center">Creador de Cruceros</h1>
+
+<div class="row">
+
+    <form asp-action="Create" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+
+        <!-- Nombre -->
+        <div class="mb-4">
+            <label asp-for="Nombre" class="form-label fw-bold">Nombre del Crucero</label>
+            <input asp-for="Nombre" class="form-control form-control-lg" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
+        </div>
+
+        <!-- Selección de Barco -->
+        <div class="mb-4">
+            <label asp-for="IdBarco" class="form-label fw-bold">Seleccionar Barco</label>
+            <select asp-for="IdBarco" class="form-select form-select-lg"
+                    asp-items="@(new SelectList(ViewBag.ListBarco, "Id", "Nombre"))">
+                <option value="">Seleccione un barco</option>
+            </select>
+            <span asp-validation-for="IdBarco" class="text-danger"></span>
+        </div>
+
+        <!-- Imagen -->
+        <div class="mb-4">
+            <label asp-for="Imagen" class="form-label fw-bold">Imagen del Crucero</label>
+            <input type="file" class="form-control form-control-lg" id="ImageFile" name="ImageFile" required accept="image/*" />
+            <span asp-validation-for="Imagen" class="text-danger"></span>
+        </div>
+
+        <!-- Imagen por defecto (nula) -->
+        <img id="previewImage" src="~/images/nophoto.png" alt="Imagen seleccionada" class="img-thumbnail" style="max-width: 200px; margin-top: 10px;" />
+
+        <!-- Selección de Itinerario -->
+        <div class="mb-4">
+            <label asp-for="Itinerario" class="form-label fw-bold">Seleccionar Puerto</label>
+            <select id="puertoSelect" class="form-select form-select-lg" asp-items="@(new SelectList(ViewBag.ListPuerto, "Id", "Nombre"))">
+                <option value="">Seleccione un Puerto</option>
+            </select>
+
+            <br />
+
+            <!-- Campo para Descripción del Itinerario -->
+            <div class="mb-4">
+                <label for="DescripcionItinerario" class="form-label fw-bold">Descripción del Itinerario</label>
+                <textarea id="DescripcionItinerario" class="form-control" rows="3" placeholder="Ingrese la descripción del itinerario"></textarea>
+            </div>
+
+            <!-- Botón para agregar el puerto al itinerario -->
+            <button type="button" class="btn btn-secondary btn-lg" onclick="agregarPuerto()">Agregar al Itinerario</button>
+        </div>
+
+        <!-- Detalle de Itinerario -->
+        <div class="mb-4">
+            <div id="ItinerarioDetalleView">
+                @await Html.PartialAsync("_DetailItinerario") <!-- Vista parcial del detalle -->
+            </div>
+        </div>
+
+        <!-- Botón para enviar el formulario -->
+        <input type="hidden" id="itinerarioJson" name="itinerarioJson" />
+        <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Crear</button>
+        <br />
+        <!-- Botón para regresar al listado -->
+        <div class="d-flex gap-2 mt-3">
+            <a asp-action="IndexAdmin" class="btn btn-dark btn-lg w-100">Regresar al listado</a>
+        </div>
+
+        <br />
+        <br />
+        <br />
+        
+    </form>
+
+    
+</div>
+
+@section Scripts {
+    <!-- Cargar jQuery y jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+
+    <script>
+            // Imagen nula
+            document.getElementById("ImageFile").addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById("previewImage").src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+
+        let orden = $("#detalleItinerario tbody tr").length + 1; // Contador de orden inicial
+
+        function agregarPuerto() {
+            const puertoId = $("#puertoSelect").val();
+            const puertoNombre = $("#puertoSelect option:selected").text();
+            const descripcion = $("#DescripcionItinerario").val().trim();
+
+            if (!puertoId) {
+                alert("Seleccione un puerto antes de agregar.");
+                return;
+            }
+
+            // Crear una nueva fila con el nuevo orden
+            const newRow = `
+                <tr>
+                    <td>
+                        <span class="puerto-nombre">${puertoNombre}</span>
+                        <input type="hidden" name="Itinerario[${orden}].IdPuerto" value="${puertoId}" />
+                    </td>
+                    <td>
+                        <input type="hidden" name="Itinerario[${orden}].Descripcion" value="${descripcion}" />
+                        ${descripcion}
+                    </td>
+                    <td class="orden-columna">
+                        <input type="hidden" name="Itinerario[${orden}].Orden" value="${orden}" />
+                        ${orden}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
+                    </td>
+                </tr>`;
+
+            // Agregar la fila a la tabla
+            $("#detalleItinerario tbody").append(newRow);
+
+            // Incrementar el orden para la siguiente fila
+            orden++;
+
+            // Limpiar campos
+            $("#puertoSelect").val("");
+            $("#DescripcionItinerario").val("");
+        }
+
+        function eliminarFila(button) {
+            // Obtener la fila a eliminar
+            let filaEliminada = $(button).closest("tr");
+            let ordenEliminado = parseInt(filaEliminada.find("input[name$='Orden']").val());
+
+            // Eliminar la fila
+            filaEliminada.remove();
+
+            // Reajustar el orden de las filas restantes
+            $("#detalleItinerario tbody tr").each(function (index) {
+                let nuevoOrden = index + 1; // Nuevo orden secuencial
+
+                // Actualizar el texto y los valores de los inputs
+                $(this).find(".orden-columna").text(nuevoOrden);
+                $(this).find("input[name$='Orden']").val(nuevoOrden);
+                $(this).find("input[name^='Itinerario']").each(function () {
+                    let nameAttr = $(this).attr("name");
+                    let newNameAttr = nameAttr.replace(/\[\d+\]/, `[${nuevoOrden}]`);
+                    $(this).attr("name", newNameAttr);
+                });
+            });
+
+            // Actualizar el contador global de orden
+            orden = $("#detalleItinerario tbody tr").length + 1;
+        }
+
+
+
+
+        $(document).ready(function () {
+            $("form").submit(function (event) {
+                let itinerario = [];
+
+                $("#detalleItinerario tbody tr").each(function () {
+                    let puertoId = $(this).find("input[name^='Itinerario'][name$='IdPuerto']").val();
+                    let descripcion = $(this).find("input[name^='Itinerario'][name$='Descripcion']").val();
+                    let orden = $(this).find("input[name^='Itinerario'][name$='Orden']").val();
+
+                    itinerario.push({
+                        IdPuerto: parseInt(puertoId),
+                        Descripcion: descripcion,
+                        Orden: parseInt(orden)
+                    });
+                });
+
+                // Convertimos el arreglo a JSON y lo insertamos en el input oculto
+                $("#itinerarioJson").val(JSON.stringify(itinerario));
+            });
+        });
+
+    </script>
+}
+

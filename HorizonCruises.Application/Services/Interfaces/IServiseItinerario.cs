@@ -11,5 +11,6 @@ namespace HorizonCruises.Application.Services.Interfaces
     {
         Task<ICollection<ItinerarioDTO>> ListAsync();
         Task<ItinerarioDTO> FindByIdAsync(int id);
+        Task<ItinerarioDTO> CreateAsync(ItinerarioDTO nDTO);
     }
 }

@@ -20,9 +20,9 @@
         <div class="text-center mt-3">
             <!-- Imagen del crucero -->
             <img src="data:image/jpeg;charset=utf-8;base64,@Convert.ToBase64String(Model.Imagen)"
-            class="img-fluid rounded"
-            alt="Imagen del crucero"
-            style="max-height: 400px; object-fit: cover;">
+                 class="img-fluid rounded"
+                 alt="Imagen del crucero"
+                 style="max-height: 400px; object-fit: cover;">
         </div>
 
         <div class="card-body">
@@ -37,7 +37,7 @@
             <div class="card mt-4">
                 <div class="card-body">
                     <h4>Fechas y Precios de Habitaciones</h4>
-                    <hr/>
+                    <hr />
                     <!--Fecha de Inicio del VIaje-->
                     @if (Model.FechaCrucero != null && Model.FechaCrucero.Count > 1)
                     {
@@ -80,14 +80,14 @@
                                         <tbody>
                                             @foreach (var precio in fecha.PrecioHabitacion)
                                             {
-                                                @if(precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-59))
+                                                @if (precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-59))
                                                 {
                                                     <tr>
                                                         <td>@precio.IdHabitacionNavigation.Nombre</td>
                                                         <td>₡ @precio.PrecioHabitacion1.ToString()</td>
                                                     </tr>
                                                 }
-                                                
+
                                             }
                                         </tbody>
                                     </table>
@@ -103,7 +103,7 @@
                         <!--Un meses antes-->
                         @foreach (var fecha in Model.FechaCrucero)
                         {
-                            
+
                             <div class="mb-3">
                                 <h5>Precios un meses antes del viaje: @fecha.FechaLimitePago.AddDays(-30)</h5>
                                 @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
@@ -136,7 +136,7 @@
                             </div>
                         }
                         <!--Aqui termina dos meses antes-->
-                        <hr/>
+                        <hr />
                         <!--Fecha Limite de pago-->
                         @foreach (var fecha in Model.FechaCrucero)
                         {
@@ -209,9 +209,9 @@
             </div>
 
             <div class="d-flex justify-content-end mt-3">
-                <a class="btn btn-primary" asp-action="CruceroIndex">Regresar al listado</a>
+                <a class="btn btn-primary" asp-action="IndexAdmin">Regresar al listado</a>
             </div>
-            <hr/>
+            <hr />
         </div>
     </div>
 </div>

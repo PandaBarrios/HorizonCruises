@@ -20,6 +20,22 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             _context = context;
         }
 
+        public async Task<Crucero> CreateAsync(Crucero crucero)
+        {
+            if (crucero == null)
+            {
+                throw new ArgumentNullException(nameof(crucero), "El objeto Crucero no puede ser nulo.");
+            }
+
+            // Agregar el crucero al contexto y guardar cambios
+            var entityEntry = await _context.Set<Crucero>().AddAsync(crucero);
+            await _context.SaveChangesAsync();
+
+            // Retornar el crucero con su Id actualizado
+            return entityEntry.Entity;
+        }
+
+
         public async Task<Crucero> FindByIdAsync(int id)
         {
             var crucero = await _context.Set<Crucero>()
@@ -49,5 +65,7 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
 
             return collection;
         }
+
+        
     }
 }

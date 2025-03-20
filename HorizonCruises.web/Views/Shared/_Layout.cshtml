@@ -99,6 +99,7 @@
 </head>
 <body>
     <!-- Navbar -->
+    <!-- Navbar -->
     <header>
         <nav class="navbar navbar-expand-lg">
             <div class="container">
@@ -123,11 +124,23 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a>
                         </li>
+
+                        <!-- Menú desplegable de Mantenimientos -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="mantenimientosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Mantenimientos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="mantenimientosDropdown">
+                                <li><a class="dropdown-item" asp-controller="Crucero" asp-action="IndexAdmin">Mantenimiento Crucero</a></li>
+                                
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
 
     <!-- Contenido Principal -->
     <div class="container mt-4">

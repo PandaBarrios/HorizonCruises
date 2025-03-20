@@ -9,6 +9,8 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
 {
     public interface IRepositoryItinerario
     {
-        Task<ICollection<Itinerario>> CruceroItinerario(int id);
+        Task<ICollection<Itinerario>> ListAsync();
+        Task<Itinerario> FindByIdAsync(int id);
+        Task<Itinerario> CreateAsync(Itinerario nItinerario);
     }
 }

@@ -28,6 +28,13 @@ namespace HorizonCruises.Application.Services.Implementations
             return objectMapped;
         }
 
+        public async Task<ICollection<PuertoDTO>> FindByNameAsync(string nombre)
+        {
+            var list = await _repository.FindByNameAsync(nombre);
+            var collection = _mapper.Map<ICollection<PuertoDTO>>(list);
+            return collection;
+        }
+
         public async Task<ICollection<PuertoDTO>> ListAsync()
         {
             //Obtener datos del repositorio 

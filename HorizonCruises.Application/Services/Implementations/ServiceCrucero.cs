@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Interfaces;
+using HorizonCruises.Infraestructure.Models;
 using HorizonCruises.Infraestructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,25 @@ namespace HorizonCruises.Application.Services.Implementations
             _mapper = mapper;
         }
 
+        public async Task<CruceroDTO> CreateAsync(CruceroDTO cruceroDTO)
+        {
+            if (cruceroDTO == null)
+            {
+                throw new ArgumentNullException(nameof(cruceroDTO), "El objeto CruceroDTO no puede ser nulo.");
+            }
+
+            // Mapear de DTO a entidad
+            var crucero = _mapper.Map<Crucero>(cruceroDTO);
+
+            // Guardar en la base de datos
+            var cruceroCreado = await _repository.CreateAsync(crucero);
+
+            // Mapear el resultado nuevamente a DTO
+            return _mapper.Map<CruceroDTO>(cruceroCreado);
+        }
+
+
+
         public async Task<CruceroDTO> FindByIdAsync(int id)
         {
             var @object = await _repository.FindByIdAsync(id);
@@ -37,5 +57,7 @@ namespace HorizonCruises.Application.Services.Implementations
             // Return lista 
             return collection;
         }
+
+        
     }
 }
