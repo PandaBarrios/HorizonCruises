@@ -9,14 +9,12 @@ namespace HorizonCruises.Application.DTOs
 
         public int IdCrucero { get; set; }
         [Display(Name = "Inico del evento")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateOnly FechaInicio { get; set; }
-        [Display(Name = "Ultimodia de reserva")]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
+        [Display(Name = "Ultimo dia de reserva")]
         public DateOnly FechaLimitePago { get; set; }
 
         public virtual CruceroDTO IdCruceroNavigation { get; set; } = null!;
 
-        public virtual List<PrecioHabitacion> PrecioHabitacion { get; set; } = null!;
+        public virtual List<PrecioHabitacionDTO> PrecioHabitacion { get; set; } = null!;
     }
 }

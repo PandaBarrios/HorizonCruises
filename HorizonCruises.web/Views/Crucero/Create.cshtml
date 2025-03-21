@@ -66,6 +66,23 @@
             </div>
         </div>
 
+       
+        <!-- Fecha de Inicio -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">El viaje comenienza</label>
+            <input type="date" class="form-control form-control-lg" id="FechaInicio" required />
+            <span class="text-danger"></span>
+        </div>
+
+        <!-- Fecha Límite de Pago -->
+        <div class="mb-4">
+            <label class="form-label fw-bold">Fecha Límite de Pago</label>
+            <input type="date" class="form-control form-control-lg" id="FechaLimitePago" disabled />
+            <span  class="text-danger"></span>
+        </div>
+
+
+
         <!-- Botón para enviar el formulario -->
         <input type="hidden" id="itinerarioJson" name="itinerarioJson" />
         <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Crear</button>
@@ -89,21 +106,25 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- Utilida Imagen -->
     <script>
-            // Imagen nula
-            document.getElementById("ImageFile").addEventListener("change", function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById("previewImage").src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
 
+        document.getElementById("ImageFile").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById("previewImage").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 
+    <!-- Utilida Agregar Puertos -->
+    <script>
         let orden = $("#detalleItinerario tbody tr").length + 1; // Contador de orden inicial
 
         function agregarPuerto() {
@@ -112,29 +133,48 @@
             const descripcion = $("#DescripcionItinerario").val().trim();
 
             if (!puertoId) {
-                alert("Seleccione un puerto antes de agregar.");
+              Swal.fire({
+                   icon: 'error',
+                   title: 'Puerto',
+                   text: 'Selecione un puerto para continuar',
+                   confirmButtonColor: '#d33',
+                   confirmButtonText: 'Entendido'
+              });
+              event.preventDefault();
                 return;
-            }
+             }
+
+            if (descripcion.length <= 10) {
+                Swal.fire({
+                   icon: 'error',
+                   title: 'Descripcion Invalida',
+                   text: 'La descripcion debe ser mas detallada',
+                   confirmButtonColor: '#d33',
+                   confirmButtonText: 'Ok'
+              });
+              event.preventDefault();
+                return;
+             }
 
             // Crear una nueva fila con el nuevo orden
             const newRow = `
-                <tr>
-                    <td>
-                        <span class="puerto-nombre">${puertoNombre}</span>
-                        <input type="hidden" name="Itinerario[${orden}].IdPuerto" value="${puertoId}" />
-                    </td>
-                    <td>
-                        <input type="hidden" name="Itinerario[${orden}].Descripcion" value="${descripcion}" />
-                        ${descripcion}
-                    </td>
-                    <td class="orden-columna">
-                        <input type="hidden" name="Itinerario[${orden}].Orden" value="${orden}" />
-                        ${orden}
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
-                    </td>
-                </tr>`;
+                        <tr>
+                            <td>
+                                <span class="puerto-nombre">${puertoNombre}</span>
+                                <input type="hidden" name="Itinerario[${orden}].IdPuerto" value="${puertoId}" />
+                            </td>
+                            <td>
+                                <input type="hidden" name="Itinerario[${orden}].Descripcion" value="${descripcion}" />
+                                ${descripcion}
+                            </td>
+                            <td class="orden-columna">
+                                <input type="hidden" name="Itinerario[${orden}].Orden" value="${orden}" />
+                                ${orden}
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger" onclick="eliminarFila(this)">Eliminar</button>
+                            </td>
+                        </tr>`;
 
             // Agregar la fila a la tabla
             $("#detalleItinerario tbody").append(newRow);
@@ -172,14 +212,141 @@
             // Actualizar el contador global de orden
             orden = $("#detalleItinerario tbody tr").length + 1;
         }
+    </script>
 
 
+    <script>
+        $('#IdBarco').change(function() {
+            var id = $(this).val();
+            console.log(id);
+        });
+    </script>
 
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+            const fechaInicioInput = document.getElementById('FechaInicio');
+            const fechaLimiteInput = document.getElementById('FechaLimitePago');
 
-        $(document).ready(function () {
+            // Establecer fecha mínima (primer día del próximo mes)
+            const today = new Date();
+            const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+            const minDate = nextMonth.toISOString().split('T')[0];
+            fechaInicioInput.setAttribute('min', minDate);
+
+            // Manejar cambio en fecha de inicio
+            fechaInicioInput.addEventListener('change', function() {
+                if(this.value) {
+                    const fechaInicio = new Date(this.value);
+                    const fechaLimite = new Date(fechaInicio);
+                    fechaLimite.setDate(fechaLimite.getDate() - 7);
+
+                    fechaLimiteInput.value = fechaLimite.toISOString().split('T')[0];
+                } else {
+                    fechaLimiteInput.value = '';
+                }
+            });
+
+            // Validación inicial
+            if(fechaInicioInput.value) {
+                fechaInicioInput.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+
+    <!-- Utilida Guardar Crucero -->
+    <script>
+          $(document).ready(function () {
             $("form").submit(function (event) {
+                let nombreCrucero = $("#Nombre").val().trim();
+                let imagenCrucero = $("#ImageFile").val();
+                let barcoSeleccionado = $("#IdBarco").val();
+                let fechaInicio = $("#FechaInicio").val();
+                let fechaLimitePago = $("#FechaLimitePago").val();
                 let itinerario = [];
 
+                // Validar Nombre del Crucero (Debe contener al menos una letra)
+                if (!/.*[a-zA-Z]+.*/.test(nombreCrucero)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Nombre inválido',
+                        text: 'El nombre del crucero debe contener al menos una letra.',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Ok'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Validar que se haya subido una imagen
+                if (!imagenCrucero) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Imagen requerida',
+                        text: 'Debe seleccionar una imagen para el crucero.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Ok'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Validar que se haya seleccionado un barco
+                if (!barcoSeleccionado) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Barco no seleccionado',
+                        text: 'Debe seleccionar un barco para el crucero.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Ok'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Validar Fecha de Inicio
+                if (!fechaInicio) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Fecha de Inicio requerida',
+                        text: 'Debe seleccionar una fecha de inicio.',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Ok'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Validar Fecha Límite de Pago
+                if (!fechaLimitePago) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Fecha Límite de Pago requerida',
+                        text: 'Debe seleccionar una fecha límite de pago.',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Ok'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Eliminar inputs ocultos previos (por si el formulario se envía varias veces)
+                $("input[name='FechaInicio']").remove();
+                $("input[name='FechaLimitePago']").remove();
+
+                // Agregar fechas como inputs ocultos
+                $("<input>").attr({
+                    type: "hidden",
+                    name: "FechaInicio",
+                    value: fechaInicio
+                }).appendTo("form");
+
+                $("<input>").attr({
+                    type: "hidden",
+                    name: "FechaLimitePago",
+                    value: fechaLimitePago
+                }).appendTo("form");
+
+                // Validar que haya al menos 2 puertos en el itinerario
                 $("#detalleItinerario tbody tr").each(function () {
                     let puertoId = $(this).find("input[name^='Itinerario'][name$='IdPuerto']").val();
                     let descripcion = $(this).find("input[name^='Itinerario'][name$='Descripcion']").val();
@@ -192,11 +359,22 @@
                     });
                 });
 
-                // Convertimos el arreglo a JSON y lo insertamos en el input oculto
+                if (itinerario.length < 2) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Itinerario insuficiente',
+                        text: 'Debe agregar al menos 2 puertos al itinerario.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Ok'
+                    });
+                    event.preventDefault();
+                    return;
+                }
+
+                // Convertir itinerario a JSON y enviarlo
                 $("#itinerarioJson").val(JSON.stringify(itinerario));
             });
         });
-
     </script>
-}
 
+}

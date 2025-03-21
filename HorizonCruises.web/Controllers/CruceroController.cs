@@ -1,8 +1,10 @@
 ﻿using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Implementations;
 using HorizonCruises.Application.Services.Interfaces;
+using HorizonCruises.Infraestructure.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Globalization;
 using System.Text.Json;
 
 namespace HorizonCruises.web.Controllers
@@ -13,15 +15,16 @@ namespace HorizonCruises.web.Controllers
         private readonly IServiceBarco _serviceBarco;
         private readonly IServiseItinerario _serviceItinerario;
         private readonly IServicePuerto _servicePuerto;
-
+        private readonly IServiceFechaCrucero _serviceFechaCrucero;
         private readonly ILogger<ServiceCrucero> _logger;
 
-        public CruceroController(IServiceCrucero serviceCrucero, IServiceBarco serviceBarco, IServiseItinerario serviceItinerario, IServicePuerto servicePuerto, ILogger<ServiceCrucero> logger)
+        public CruceroController(IServiceCrucero serviceCrucero, IServiceBarco serviceBarco, IServiseItinerario serviceItinerario, IServicePuerto servicePuerto, IServiceFechaCrucero serviceFechaCrucero, ILogger<ServiceCrucero> logger)
         {
             _serviceCrucero = serviceCrucero;
             _serviceBarco = serviceBarco;
             _serviceItinerario = serviceItinerario;
             _servicePuerto = servicePuerto;
+            _serviceFechaCrucero = serviceFechaCrucero;
             _logger = logger;
         }
 
@@ -81,14 +84,18 @@ namespace HorizonCruises.web.Controllers
         {
             ViewBag.ListBarco = await _serviceBarco.ListAsync();
             ViewBag.ListPuerto = await _servicePuerto.ListAsync();
+            ViewBag.ListFechasCrucero = await _serviceFechaCrucero.ListAsync();
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CruceroDTO cruceroDTO, IFormFile ImageFile, string itinerarioJson)
+        public async Task<IActionResult> Create(CruceroDTO cruceroDTO,
+                                        IFormFile ImageFile,
+                                        string itinerarioJson,
+                                        string FechaInicio,
+                                        string FechaLimitePago)
         {
-
             try
             {
                 // Procesar la imagen si se ha subido
@@ -111,6 +118,16 @@ namespace HorizonCruises.web.Controllers
                     return View(cruceroDTO);
                 }
 
+                // Validar y convertir fechas
+                if (!DateOnly.TryParseExact(FechaInicio, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly fechaInicioConvertida) ||
+                    !DateOnly.TryParseExact(FechaLimitePago, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly fechaLimiteConvertida))
+                {
+                    ModelState.AddModelError("Fecha", "Formato de fecha inválido.");
+                    ViewBag.ListBarco = await _serviceBarco.ListAsync();
+                    ViewBag.ListPuerto = await _servicePuerto.ListAsync();
+                    return View(cruceroDTO);
+                }
+
                 // Establecer la cantidad de días
                 cruceroDTO.CantidadDias = itinerario.Count;
 
@@ -124,6 +141,16 @@ namespace HorizonCruises.web.Controllers
                     await _serviceItinerario.CreateAsync(item);
                 }
 
+                // Guardar Fecha Crucero
+                var fechaCrucero = new FechaCruceroDTO
+                {
+                    IdCrucero = cruceroCreado.Id,
+                    FechaInicio = fechaInicioConvertida,
+                    FechaLimitePago = fechaLimiteConvertida
+                };
+
+                await _serviceFechaCrucero.CreateAsync(fechaCrucero);
+
                 return RedirectToAction("IndexAdmin");
             }
             catch (Exception ex)
@@ -135,6 +162,7 @@ namespace HorizonCruises.web.Controllers
                 return View(cruceroDTO);
             }
         }
+
 
         public async Task<ActionResult> DetailsAdmin(int? id)
         {

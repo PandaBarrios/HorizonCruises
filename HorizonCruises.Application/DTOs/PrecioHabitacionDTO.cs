@@ -11,9 +11,9 @@ namespace HorizonCruises.Application.DTOs
 
         public int IdHabitacion { get; set; }
 
-        public decimal? PrecioHabitacion1 { get; set; }
+        public decimal PrecioHabitacion1 { get; set; }
 
-        [Display(Name = "Fecha Limite de Precios")]
+        [Display(Name = "Fecha Limite del Precio")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateOnly FechaLimitePrecio { get; set; }
 

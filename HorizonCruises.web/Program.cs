@@ -27,6 +27,8 @@ builder.Services.AddTransient<IRepositoryReserva, RepositoryReserva>();
 builder.Services.AddTransient<IRepositoryPuerto, RepositoryPuerto>();
 builder.Services.AddTransient<IRepositoryBarcoHabitaciones, RepositoryBarcoHabitaciones>();
 builder.Services.AddTransient<IRepositoryItinerario, RepositoryItinerario>();
+builder.Services.AddTransient<IRepositoryFechaCrucero, RepositoryFechaCrucero>();
+builder.Services.AddTransient<IRepositoryPrecioHabitacion, RepositoryPrecioHabitacion>();
 //Services 
 builder.Services.AddTransient<IServiceBarco, ServiceBarco>();
 builder.Services.AddTransient<IServiceCrucero, ServiceCrucero>();
@@ -37,6 +39,8 @@ builder.Services.AddTransient<IServiceReserva, ServiceReserva>();
 builder.Services.AddTransient<IServicePuerto, ServicePuerto>();
 builder.Services.AddTransient<IServiceBarcoHabitaciones, ServiceBarcoHabitaciones>();
 builder.Services.AddTransient<IServiseItinerario, ServiceItinerario>();
+builder.Services.AddTransient<IServiceFechaCrucero, ServiceFechaCrucero>();
+builder.Services.AddTransient<IServicePrecioHabitacion, ServicePrecioHabitacion>();
 
 //Configurar Automapper 
 builder.Services.AddAutoMapper(config =>
