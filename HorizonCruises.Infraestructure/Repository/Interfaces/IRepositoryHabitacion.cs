@@ -11,5 +11,7 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
     {
         Task<ICollection<Habitacion>> ListAsync();
         Task<Habitacion> FindByIdAsync(int id);
+        Task<int> AddAsync(Habitacion entity);
+        Task UpdateAsync(Habitacion entity);
     }
 }

@@ -36,5 +36,38 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                                 .FirstAsync();
             return @object!;
         }
+
+        public async Task<Barco?> ObtenerBarcoPorIdAsync(int id)
+        {
+            return await _context.Barco
+                .Include(b => b.BarcoHabitaciones)
+                .ThenInclude(bh => bh.IdHabitacionNavigation)
+                .FirstOrDefaultAsync(b => b.Id == id);
+        }
+
+        public async Task<bool> ExisteHabitacionEnBarco(int idBarco, int idHabitacion)
+        {
+            return await _context.BarcoHabitaciones
+                .AnyAsync(bh => bh.IdBarco == idBarco && bh.IdHabitacion == idHabitacion);
+        }
+
+        public async Task<bool> UpdateAsync(Barco entity)
+        {
+            _context.Barco.Update(entity);
+            return await _context.SaveChangesAsync() > 0; 
+        }
+
+        public async Task<bool> AddAsync(Barco entity)
+        {
+            _context.Barco.Add(entity);
+            return await _context.SaveChangesAsync() > 0; 
+        }
+
+        public void RemoveHabitacionesByBarcoId(int barcoId)
+        {
+            var habitaciones = _context.BarcoHabitaciones.Where(bh => bh.IdBarco == barcoId);
+            _context.BarcoHabitaciones.RemoveRange(habitaciones);
+            _context.SaveChanges();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HorizonCruises.Application.DTOs;
+using HorizonCruises.Infraestructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,7 @@ namespace HorizonCruises.Application.Services.Interfaces
     {
         Task<ICollection<BarcoDTO>> ListAsync();
         Task<BarcoDTO> FindByIdAsync(int id);
+        Task<bool> AddAsync(BarcoDTO dto);
+        Task<bool> UpdateAsync(BarcoDTO dto);
     }
 }

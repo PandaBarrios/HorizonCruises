@@ -13,7 +13,21 @@ namespace HorizonCruises.Application.Profiles
     {
         public BarcoHabitacionesProfile()
         {
-            CreateMap<BarcoHabitacionesDTO, BarcoHabitacionesDTO>().ReverseMap();
+            // Mapeo entre DTO y entidad
+            CreateMap<BarcoHabitacionesDTO, BarcoHabitaciones>()
+                .ForMember(dest => dest.IdBarco, orig => orig.MapFrom(o => o.IdBarco))
+                .ForMember(dest => dest.IdHabitacion, orig => orig.MapFrom(o => o.IdHabitacion))
+                .ForMember(dest => dest.TotalHabitacionesDisponibles, orig => orig.MapFrom(o => o.TotalHabitacionesDisponibles))
+
+                // Evitar que se mapeen las propiedades de navegación (para evitar error de referencia nula)
+                .ForMember(dest => dest.IdBarcoNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdHabitacionNavigation, opt => opt.Ignore());
+
+            // Mapeo inverso (de entidad a DTO)
+            CreateMap<BarcoHabitaciones, BarcoHabitacionesDTO>()
+                .ForMember(dest => dest.IdBarco, orig => orig.MapFrom(o => o.IdBarco))
+                .ForMember(dest => dest.IdHabitacion, orig => orig.MapFrom(o => o.IdHabitacion))
+                .ForMember(dest => dest.TotalHabitacionesDisponibles, orig => orig.MapFrom(o => o.TotalHabitacionesDisponibles));
         }
-    }
+    }   
 }

@@ -1,0 +1,76 @@
+﻿@model HorizonCruises.Application.DTOs.HabitacionDTO
+
+@{
+    ViewData["Title"] = "Crear Habitación";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center mb-0">Crear Nueva Habitación</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" asp-antiforgery="true" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row row-cols-1 row-cols-md-2 g-3">
+                            <div class="col">
+                                <label asp-for="Nombre" class="form-label fw-bold"></label>
+                                <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
+                                <span asp-validation-for="Nombre" class="text-danger"></span>
+                            </div>
+
+                            <div class="col">
+                                <label asp-for="Descripcion" class="form-label fw-bold"></label>
+                                <input asp-for="Descripcion" class="form-control" placeholder="Descripción breve" />
+                                <span asp-validation-for="Descripcion" class="text-danger"></span>
+                            </div>
+
+                            <div class="col">
+                                <label asp-for="CantidadMinimaHuespedes" class="form-label fw-bold"></label>
+                                <input asp-for="CantidadMinimaHuespedes" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="CantidadMinimaHuespedes" class="text-danger"></span>
+                            </div>
+
+                            <div class="col">
+                                <label asp-for="CantidadMaximaHuespedes" class="form-label fw-bold"></label>
+                                <input asp-for="CantidadMaximaHuespedes" class="form-control" type="number" min="1" />
+                                <span asp-validation-for="CantidadMaximaHuespedes" class="text-danger"></span>
+                            </div>
+
+                            <div class="col">
+                                <label asp-for="Tamano" class="form-label fw-bold"></label>
+                                <input asp-for="Tamano" class="form-control" placeholder="Ej. 25 m²" />
+                                <span asp-validation-for="Tamano" class="text-danger"></span>
+                            </div>
+
+                            <div class="col">
+                                <label asp-for="Tipo" class="form-label fw-bold"></label>
+                                <select asp-for="Tipo" class="form-select">
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="Estándar">Estándar</option>
+                                    <option value="Suite">Suite</option>
+                                    <option value="Deluxe">Deluxe</option>
+                                </select>
+                                <span asp-validation-for="Tipo" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-outline-secondary">← Volver</a>
+                            <button type="submit" class="btn btn-primary px-4">Crear Habitación</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

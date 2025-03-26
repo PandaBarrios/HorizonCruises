@@ -28,8 +28,6 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                 .FirstAsync(bh => bh.IdBarco == id);
         }
 
-
-
         // Listar TODAS las relaciones barco-habitaciones
         public async Task<ICollection<BarcoHabitaciones>> ListAsync()
         {

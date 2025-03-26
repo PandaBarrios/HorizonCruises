@@ -34,5 +34,51 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             var collection = await _context.Set<Habitacion>().ToListAsync();
             return collection;
         }
+
+        public async Task<int> AddAsync(Habitacion entity)
+        {
+            try
+            {
+                _context.Habitacion.Add(entity);
+                await _context.SaveChangesAsync();
+                return entity.Id;
+            }
+            catch (DbUpdateException ex)
+            {
+                var innerMessage = ex.InnerException?.Message;
+                Console.WriteLine($"Error interno: {innerMessage}");
+
+                // Opcional: También puedes registrar el error en logs
+                // _logger.LogError($"Error al agregar habitación: {innerMessage}");
+
+                // Retorna -1 o lanza una excepción personalizada
+                return -1;
+            }
+            catch (Exception ex)  // Captura otros errores inesperados
+            {
+                Console.WriteLine($"Error desconocido: {ex.Message}");
+                return -1;
+            }
+        }
+
+        public async Task UpdateAsync(Habitacion entity)
+        {
+            var habitacionExistente = await _context.Habitacion.FindAsync(entity.Id);
+
+            if (habitacionExistente == null)
+            {
+                throw new KeyNotFoundException($"No se encontró la habitación con ID {entity.Id}");
+            }
+
+            // Actualizar los valores necesarios
+            habitacionExistente.CantidadMaximaHuespedes = entity.CantidadMaximaHuespedes;
+            habitacionExistente.CantidadMinimaHuespedes = entity.CantidadMinimaHuespedes;
+            habitacionExistente.Descripcion = entity.Descripcion;
+            habitacionExistente.Nombre = entity.Nombre;
+            habitacionExistente.Tamano = entity.Tamano;
+            habitacionExistente.Tipo = entity.Tipo;
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

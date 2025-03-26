@@ -20,6 +20,9 @@
                                 <i class="bi bi-info-circle"></i> <strong>Descripción:</strong> @Html.DisplayFor(modelItem => item.Descripcion)
                             </p>
                             <p class="card-text text-secondary">
+                                <i class="bi bi-people-fill"></i> <strong>Capacidad:</strong> @Html.DisplayFor(modelItem => item.CantidadMinimaHuespedes) - @Html.DisplayFor(modelItem => item.CantidadMaximaHuespedes) huéspedes
+                            </p>
+                            <p class="card-text text-secondary">
                                 <i class="bi bi-arrows-angle-expand"></i> <strong>Tamaño:</strong> @Html.DisplayFor(modelItem => item.Tamano)
                             </p>
                             <p class="card-text text-secondary">
@@ -29,10 +32,10 @@
                                 <a class="btn btn-outline-primary px-4" asp-action="Details" asp-route-id="@item.Id">
                                     <i class="bi bi-eye"></i> Ver Detalles
                                 </a>
-                                @* <a class="btn btn-outline-warning px-4" asp-action="Edit" asp-route-id="@item.Id">
+                                <a class="btn btn-outline-warning px-4" asp-action="Edit" asp-route-id="@item.Id">
                                     <i class="bi bi-pencil-square"></i> Editar
                                 </a>
-                                <a class="btn btn-outline-danger px-4" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('¿Estás seguro de eliminar esta habitación?');">
+                                @* <a class="btn btn-outline-danger px-4" asp-action="Delete" asp-route-id="@item.Id" onclick="return confirm('¿Estás seguro de eliminar esta habitación?');">
                                     <i class="bi bi-trash"></i> Eliminar
                                 </a> *@
                             </div>
@@ -48,4 +51,4 @@
     <a class="btn btn-success btn-lg" asp-action="Create">
         <i class="bi bi-plus-lg"></i> Agregar Nueva Habitación
     </a>
-</p> *@
+</p>  *@

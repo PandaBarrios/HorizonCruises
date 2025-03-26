@@ -11,7 +11,11 @@ namespace HorizonCruises.Application.DTOs
     public record BarcoDTO
     {
         public int Id { get; set; }
+
+        [Display(Name = "Nombre")]
         public string? Nombre { get; set; }
+
+        [Display(Name = "Descripción")]
         public string? Descripcion { get; set; }
 
         [Display(Name = "Capacidad de Huéspedes")]
