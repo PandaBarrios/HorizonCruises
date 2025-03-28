@@ -19,6 +19,14 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             _context = context;
         }
 
+        public async Task<Reserva> CreateAsync(Reserva reserva)
+        {
+            var entityEntry = await _context.Set<Reserva>().AddAsync(reserva);
+            await _context.SaveChangesAsync();
+
+            return entityEntry.Entity;
+        }
+
         public async Task<Reserva> FindByIdAsync(int id)
         {
             var reserva = await _context.Reserva
