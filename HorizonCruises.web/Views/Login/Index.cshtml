@@ -1,0 +1,109 @@
+﻿@model HorizonCruises.web.ViewModels.ViewModelLogin
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HorizonCruises.web</title> <!-- Título dinámico -->
+    <!-- Estilos principales -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HorizonCruises.web.styles.css" asp-append-version="true" />
+
+    <!-- Plugins visuales -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"> <!-- Notificaciones -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.min.css" rel="stylesheet"> <!-- Alertas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> <!-- Íconos -->
+</head>
+<body>
+    <div class="container mt-5 pt-5">
+        <!-- Margen superior para centrar -->
+        <div class="row justify-content-center">
+            <!-- Centra horizontalmente -->
+            <div class="col-12 col-md-6 col-xl-4">
+                <!-- Responsivo -->
+                <div class="card">
+                    <div class="card-header">
+                        Iniciar Sesión
+                    </div>
+                    <div class="card-body">
+                        <!-- Formulario de login -->
+                        <form asp-controller="Login" asp-action="LogIn" method="post" asp-antiforgery="true">
+                            <div class="form-group">
+                                <!-- Campo usuario -->
+                                <label asp-for="CorreoElectronico" class="control-label" placeholder="Usuario"></label>
+                                <input asp-for="CorreoElectronico" class="form-control" type="text" autocomplete="true" />
+                                <span asp-validation-for="CorreoElectronico" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <!-- Campo contraseña -->
+                                <label asp-for="Contrasena" class="control-label" placeholder="Contraseña"></label>
+                                <input asp-for="Contrasena" class="form-control" type="password" autocomplete="true" />
+                                <span asp-validation-for="Contrasena" class="text-danger"></span>
+                            </div>
+
+                            <!-- Botón de login con efecto spinner -->
+                            <div class="d-grid gap-2 mb-3 mt-2">
+                                <button class="btn btn-primary" type="submit" onclick="spinnerEffect()">Iniciar Sesión</button>
+                            </div>
+
+                            <div class="text-center mt-2">
+                                <a asp-controller="Usuario" asp-action="Create" class="btn btn-outline-secondary">
+                                    <i class="bi bi-person-plus"></i> Crear nuevo usuario
+                                </a>
+                            </div>
+
+                            <!-- Spinner de carga -->
+                            <div id="loader" class="loadingXXXX" style="width: 3rem; height: 3rem;" role="status">
+                            </div>
+
+
+                            <!-- Mensaje de error desde el controlador -->
+                            @if (@ViewBag.Message != null)
+                            {
+                                <div class="form-group">
+                                    <div id="message" class="alert alert-danger" role="alert">
+                                        @ViewBag.Message
+                                    </div>
+                                </div>
+                            }
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script para mostrar el spinner -->
+    <script type="text/javascript">
+        function spinnerEffect() {
+            console.log("spinnerEffect")
+            document.getElementById("loader").innerHTML = "" // Limpia el contenido
+            document.getElementById("loader").className = "loading"; // Asigna clase que activa animación
+        }
+    </script>
+
+    <!-- Librerías JS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Plugins para efectos visuales -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.all.min.js"></script>
+
+    <!-- Script para mostrar notificaciones personalizadas desde el backend -->
+    @if (ViewBag.NotificationMessage != null)
+    {
+        <script>
+            @Html.Raw(@ViewBag.NotificationMessage);
+        </script>
+    }
+</body>
+</html>

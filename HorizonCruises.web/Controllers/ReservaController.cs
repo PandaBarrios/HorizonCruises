@@ -1,9 +1,11 @@
 ﻿using HorizonCruises.Application.Services.Implementations;
 using HorizonCruises.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HorizonCruises.web.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class ReservaController : Controller
     {
         private readonly IServiceReserva _serviceReserva;

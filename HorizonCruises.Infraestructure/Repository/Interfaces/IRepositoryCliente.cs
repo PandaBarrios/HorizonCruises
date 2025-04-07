@@ -9,11 +9,13 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
 {
     public interface IRepositoryCliente
     {
-        //Task<ICollection<Usuario>> FindByDescriptionAsync(string description);
+        Task<ICollection<Usuario>> FindByDescriptionAsync(string description);
         Task<ICollection<Usuario>> ListAsync();
-        Task<Usuario> FindByIdAsync(int id);
-        Task<int> AddAsync(Usuario entity);
-        Task DeleteAsync(int id);
+        Task<Usuario> FindByIdAsync(string id);
+
+        Task<Usuario> LoginAsync(string id, string password);
+        Task<string> AddAsync(Usuario entity);
+        Task DeleteAsync(string id);
         Task UpdateAsync();
     }
 }

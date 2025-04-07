@@ -28,13 +28,14 @@ namespace HorizonCruises.Application.DTOs
 
         public int IdRol { get; set; }
 
-        public virtual RolDTO IdRolNavigation { get; set; } = null!;
+        public virtual RolDTO? IdRolNavigation { get; set; }
 
-        public virtual List<ReservaDTO> Reserva { get; set; } = null!;
+        public virtual List<ReservaDTO>? Reserva { get; set; }
 
-        public virtual List<TarjetaDTO> Tarjeta { get; set; } = null!;
+        public virtual List<TarjetaDTO>? Tarjeta { get; set; }
 
-        public virtual List<TelefonoDTO> Telefono { get; set; } = null!;
+        public virtual List<TelefonoDTO>? Telefono { get; set; }
+
     }
 
 }

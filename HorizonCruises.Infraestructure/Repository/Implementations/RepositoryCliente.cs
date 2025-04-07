@@ -20,33 +20,30 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             _context = context;
         }
 
-        public async Task<int> AddAsync(Usuario entity)
+        public async Task<string> AddAsync(Usuario entity)
         {
             await _context.Set<Usuario>().AddAsync(entity);
             await _context.SaveChangesAsync();
-            return entity.Id;
+            return entity.CorreoElectronico;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(string id)
         {
             var @object = await FindByIdAsync(id);
             _context.Remove(@object);
             _context.SaveChanges();
         }
 
-        //Funcion para buscar Usuarios 
-        /*
         public async Task<ICollection<Usuario>> FindByDescriptionAsync(string description)
         {
-            description = description.Replace(' ', '%');
-            description = "%" + description + "%";
-            FormattableString sql = $@"select * from Usuario where Nombre+correo_electronico+fecha_nacimiento+pais like  {description}  ";
-
-            var collection = await _context.Usuario.FromSql(sql).AsNoTracking().ToListAsync();
+            var collection = await _context
+                                         .Set<Usuario>()
+                                         .Where(x => x.Nombre.Contains(description))
+                                         .ToListAsync();
             return collection;
-        } */
+        }
 
-        public async Task<Usuario> FindByIdAsync(int id)
+        public async Task<Usuario> FindByIdAsync(string id)
         {
             var @object = await _context.Set<Usuario>().FindAsync(id);
 
@@ -55,8 +52,21 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
 
         public async Task<ICollection<Usuario>> ListAsync()
         {
-            var collection = await _context.Set<Usuario>().AsNoTracking().ToListAsync();
+            var collection = await _context.Set<Usuario>()
+                                         .Include(x => x.IdRolNavigation)
+                                         .ToListAsync();
             return collection;
+        }
+
+        public async Task<Usuario> LoginAsync(string id, string password)
+        {
+            var @object = await _context.Set<Usuario>()
+                            .Include(b => b.IdRolNavigation)
+                            .Where(p => p.CorreoElectronico == id && p.Contrasena == password)
+                            .FirstOrDefaultAsync();
+
+            return @object!; // <-- sin el ! obligatorio
+
         }
 
         public async Task UpdateAsync()
@@ -64,4 +74,5 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             await _context.SaveChangesAsync();
         }
     }
+
 }

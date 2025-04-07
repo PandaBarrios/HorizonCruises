@@ -4,13 +4,15 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Libreria</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap-pulse.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Libreria.Web.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>@ViewData["Title"] - Cruceros al Horizonte</title>
 
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HorizonCruises.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="row flex-nowrap">
@@ -19,34 +21,30 @@
                     <a href="@Url.Action("Index", "Home")" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
 
                         <i class="bi bi-book"></i>
-                        <span class="fs-5 d-none d-sm-inline"> Librería</span>
+                        <span class="fs-5 d-none d-sm-inline"> Cruceros al Horizonte</span>
                     </a>
                     <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Reserva" asp-action="IndexReserva">Reservar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Barco" asp-action="Index">Barcos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Habitacion" asp-action="Index">Habitaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a>
+                        </li>
+
                         <li>
                             <a href="#submenuMantenimiento" data-bs-toggle="collapse" class="nav-link text-white px-0 align-middle">
                                 <i class="fs-4 bi-wrench"></i> <span class="ms-1 d-none d-sm-inline">Mantenimientos</span>
                             </a>
                             <ul class="collapse show nav flex-column ms-1" id="submenuMantenimiento" data-bs-parent="#menu">
 
-                                <li>
-                                    <a asp-controller="Autor" asp-action="Index" class="nav-link px-0"><span class="d-none d-sm-inline"></span>  Autores </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Libro" asp-action="Index" class="nav-link px-0"><span class="d-none d-sm-inline"></span> Libros </a>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li>
-                            <a href="#submenuProcesos" data-bs-toggle="collapse" class="nav-link text-white px-0 align-middle">
-                                <i class="fs-4 fs-4 bi-gear-fill"></i> <span class="ms-1 d-none d-sm-inline">Proceso</span>
-                            </a>
-
-                            <ul class="collapse show nav flex-column ms-1" id="submenuProcesos" data-bs-parent="#menu">
-                                <li class="w-100">
-                                    <a asp-controller="Orden" asp-action="Index" class="nav-link px-0"><span class="d-none d-sm-inline"></span> Ordenes </a>
-
-                                </li>
+                                <li><a class="dropdown-item" asp-controller="Crucero" asp-action="IndexAdmin">Mantenimiento Crucero</a></li>
                             </ul>
                         </li>
 

@@ -1,167 +1,63 @@
 ﻿<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Horizon Cruises</title>
+    <title>@ViewData["Title"] - Cruceros al Horizonte </title>
+
+    <!-- Bootstrap correcto -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <style>
-        /* Estilo para mantener el footer en la parte inferior */
-        html, body {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding-bottom: 60px;
-        }
+    <link rel="stylesheet" href="~/HorizonCruises.web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-        main {
-            flex: 1;
-        }
+    <!--SweetAlert-->
+    <link rel="stylesheet" href="~/css/sweetalert2.min.css" asp-append-version="true" />
 
-        footer {
-            background: #003366;
-            color: white;
-            text-align: center;
-            padding: 15px;
-            position: fixed; /* 🔥 Mantiene el footer en la parte inferior */
-            bottom: 0; /* 🔥 Se queda pegado abajo */
-            left: 0;
-            width: 100%;
-            z-index: 1000; /* 🔥 Asegura que esté sobre otros elementos */
-        }
+    <!-- Multi-select -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.css" rel="stylesheet" />
 
-        /* Estilos del Navbar */
-        .navbar {
-            background: linear-gradient(to right, #007bff, #00aaff);
-        }
-
-        .navbar-brand {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
-
-        .navbar-nav .nav-link {
-            font-size: 1.2rem;
-            color: white !important;
-            transition: 0.3s;
-        }
-
-            .navbar-nav .nav-link:hover {
-                color: #ffdd57 !important;
-            }
-
-        /* Banner Principal */
-        .hero-section {
-            background: url('/images/cruise-banner.jpg') center/cover no-repeat;
-            background-size: cover;
-            height: 70vh; /* Ajustamos la altura para hacerlo más compacto */
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            padding: 0 15px;
-        }
-
-        footer a {
-            color: #ffdd57;
-            text-decoration: none;
-        }
-
-            footer a:hover {
-                text-decoration: underline;
-            }
-
-        .btn-lg {
-            padding: 10px 30px;
-            font-size: 1.2rem;
-        }
-
-        /* Testimonios */
-        .testimonial {
-            border-left: 4px solid #007bff;
-            padding: 20px;
-            font-style: italic;
-            background-color: #f9f9f9;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-            .testimonial:hover {
-                transform: translateY(-10px);
-            }
-    </style>
+    <!--JQuery UI CSS-->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 </head>
+
 <body>
-    <!-- Navbar -->
-    <!-- Navbar -->
     <header>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand text-white" asp-controller="Home" asp-action="Index">Horizon Cruises</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Reserva" asp-action="IndexReserva">Reservar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Barco" asp-action="Index">Barcos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Habitacion" asp-action="Index">Habitaciones</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a>
-                        </li>
-
-                        <!-- Menú desplegable de Mantenimientos -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="mantenimientosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Mantenimientos
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="mantenimientosDropdown">
-                                <li><a class="dropdown-item" asp-controller="Crucero" asp-action="IndexAdmin">Mantenimiento Crucero</a></li>
-                                
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        @await Html.PartialAsync("_Menu")
     </header>
-
-
-    <!-- Contenido Principal -->
-    <div class="container mt-4">
-        <main role="main">
+    <div class="container">
+        <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-auto">
+    <footer class="border-top footer bg-primary text-light">
         <div class="container">
-            &copy; 2025 - Horizon Cruises
+            &copy; 2025 - Cruceros al Horizonte - <a class="text-bg-primary" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Ajax unobtrusive-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ajax-unobtrusive/3.2.6/jquery.unobtrusive-ajax.js"
+            integrity="sha512-f04GBpoqEZhbyjlRTuXeg8FIHDb+xfCJ0LVdqiN1fEl5B3jz3Z0SPe9IxDumOVdTeeXmKMcMJhb26VuGf1Laqw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!--SweetAlert-->
+    <script src="~/js/sweetalert2.all.min.js" asp-append-version="true"></script>
+    <!-- Multi-select -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js"></script>
+    <!-- JQuery UI Autocomplete -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    @if (ViewBag.NotificationMessage != null)
+    {
+        <script>
+
+            @Html.Raw(@ViewBag.NotificationMessage);
+        </script>
+    }
 </body>
 </html>
-
-
-
-

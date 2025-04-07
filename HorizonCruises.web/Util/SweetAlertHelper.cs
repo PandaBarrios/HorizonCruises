@@ -1,4 +1,4 @@
-﻿namespace Libreria.Web.Util
+﻿namespace HorizonCruises.web.Util
 {
     public class SweetAlertHelper
     {

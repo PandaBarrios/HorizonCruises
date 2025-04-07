@@ -5,7 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Libreria.Application.Utils
+namespace HorizonCruises.Application.Utils
+
 {
     internal class Cryptography
     {
