@@ -1,6 +1,6 @@
 ﻿<nav class="navbar navbar-expand-lg navbar-light bg-primary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="@Url.Action("Index","Home")">Crucero al horizonte</a>
+        <a class="navbar-brand text-white" href="@Url.Action("Index","Home")">Crucero al Horizonte</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -8,44 +8,64 @@
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav flex-grow-1">
                 <!-- Menú común -->
+                
                 <li class="nav-item">
-                    <a class="nav-link" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a>
+                    <a class="nav-link text-white" asp-controller="Barco" asp-action="Index">Barcos</a>
                 </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-controller="Habitacion" asp-action="Index">Habitaciones</a>
+                </li>
+                @if (User.IsInRole("Cliente")){
+                <li class="nav-item">
+                    <a class="nav-link text-white" asp-controller="Reserva" asp-action="">Mis Reservas</a>
+                </li>
+                }
 
                 <!-- Dropdown Mantenimientos -->
+                 @if (User.IsInRole("Administrador"))
+                 {  
+
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-wrench"></i> Mantenimientos
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Mantenimientos
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" asp-controller="Autor" asp-action="Index">Autores</a></li>
-                        @if (User.IsInRole("Administrador") || User.IsInRole("Cliente"))
-                        {
-                            <li><a class="dropdown-item" asp-controller="Crucero" asp-action="CruceroIndex">Cruceros</a></li>
-                        }
+                       
+                            <li><a class="dropdown-item" asp-controller="Barco" asp-action="IndexAdmin">Barcos</a></li>
+                            <li><a class="dropdown-item" asp-controller="Crucero" asp-action="IndexAdmin">Cruceros</a></li>
+                            <li><a class="dropdown-item" asp-controller="Habitacion" asp-action="IndexAdmin">Habitaciones</a></li>
+                            <li><a class="dropdown-item" asp-controller="Reserva" asp-action="IndexReserva">Reservas</a></li>
+                        
                     </ul>
                 </li>
+                }
 
                 <!-- Dropdown Seguridad -->
+                @if (User.IsInRole("Administrador"))
+                {
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fs-4 bi-people"></i> Seguridad
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Seguridad
                     </a>
-                    @if (User.IsInRole("Administrador"))
-                    {
+                    
                         <ul class="dropdown-menu">
-                            <li><a href="@Url.Action("Index", "Usuario")" class="dropdown-item">Usuario</a></li>
+                            <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Index">Usuarios</a></li>
                         </ul>
-                    }
+                    
                 </li>
-
+                }
                 <!-- Perfil -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img class="rounded-circle mx-2 mt-1" src="~/images/profile.png" alt="@User.Identity!.Name" width="32" height="32" />
-                        <span class="d-none d-sm-inline mx-1">@User.Identity!.Name</span>
+                <li class="nav-item dropdown ms-auto">
+                    <a class="nav-link dropdown-toggle text-white d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="~/images/perfil.png" alt="@User.Identity!.Name" width="32" height="32" class="rounded-circle me-2" />
+                        <span class="d-none d-sm-inline">@User.Identity!.Name</span>
                     </a>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" asp-controller="Login" asp-action="LogOff">Salir</a></li>
                     </ul>
                 </li>
@@ -53,3 +73,4 @@
         </div>
     </div>
 </nav>
+

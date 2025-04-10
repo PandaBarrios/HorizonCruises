@@ -30,7 +30,7 @@ namespace HorizonCruises.web.Middleware
                 // Create Random IdEvent  
                 Random random = new Random();
                 eventId = random.Next(1, 5000).ToString("######") + "-" +
-        DateTime.Now.ToString("yyMMddhhmmss");
+                DateTime.Now.ToString("yyMMddhhmmss");
 
                 ErrorMiddlewareViewModel result = new ErrorMiddlewareViewModel
                 {
