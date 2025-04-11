@@ -11,6 +11,7 @@ using System.Text;
 using HorizonCruises.web.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Libreria.Application.Config;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,6 +109,12 @@ var logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog(logger);
 //*************************** 
+
+//Permite colocar el simbolo del colon de manera global
+var cultureInfo = new CultureInfo("es-CR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var app = builder.Build();
 
 // Middleware

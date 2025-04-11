@@ -1,4 +1,5 @@
 ﻿using HorizonCruises.Infraestructure.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace HorizonCruises.Application.DTOs
 {
@@ -10,6 +11,7 @@ namespace HorizonCruises.Application.DTOs
 
         public string Descripcion { get; set; } = null!;
 
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Precio { get; set; }
 
         public bool AplicadoA { get; set; }

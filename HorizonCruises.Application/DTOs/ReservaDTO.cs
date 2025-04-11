@@ -24,13 +24,17 @@ namespace HorizonCruises.Application.DTOs
         public bool Estado { get; set; }
 
         [Display(Name = "Saldo Pendiente")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Saldopendiente { get; set; }
 
         [Display(Name = "Impuesto")]
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Iva { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal SubTotal { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Total { get; set; }
 
         public virtual CruceroDTO IdCruceroNavigation { get; set; } = null!;

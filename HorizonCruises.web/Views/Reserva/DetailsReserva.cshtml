@@ -24,7 +24,7 @@
             <p><strong>Estado:</strong> @(Model.Saldopendiente > 0 ? "Pendiente" : "Pagado")</p>
             @if (Model.Saldopendiente > 0)
             {
-                <p><strong>Saldo Pendiente:</strong> @Model.Saldopendiente $</p>
+                <p><strong>Saldo Pendiente:</strong> @Model.Saldopendiente.ToString("C") </p>
                 <p>
                     <strong>Fecha Límite de Pago:</strong> @(Model.IdCruceroNavigation.FechaCrucero[0].FechaLimitePago)
                 </p>
@@ -51,7 +51,7 @@
                 <tr>
                     <td>@hab.IdHabitacionNavigation.Nombre</td>
                     <td>@hab.CantidadPasajerosHabitacion</td>
-                    <td>₡ @precio</td>
+                    <td>@precio.ToString("C")</td>
                 </tr>
             }
         </tbody>
@@ -75,8 +75,8 @@
                 <tr>
                     <td>@comp.IdComplementoNavigation.Nombre</td>
                     <td>@comp.Cantidad</td>
-                    <td>@comp.IdComplementoNavigation.Precio</td>
-                    <td>@precio</td>
+                    <td>@comp.IdComplementoNavigation.Precio.ToString("C")</td>
+                    <td>@precio.ToString("C")</td>
 
                 </tr>
             }
