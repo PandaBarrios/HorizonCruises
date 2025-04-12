@@ -1,44 +1,59 @@
 ﻿@model HorizonCruises.Application.DTOs.ReservaDTO
 
 @{
-
-    ViewData["Title"] = "Factura de Reserva";
-
+    ViewData["Title"] = "Resumen de Reserva – Crucero #" + @Model.Id;
+    var fechaEmision = DateTime.Now.ToString("dd/MM/yyyy");
+    var totalHabitaciones = Model.ReservaHabitacion.Sum(h =>
+    {
+        var precio = h.IdHabitacionNavigation.PrecioHabitacion
+            .FirstOrDefault(p => p.IdHabitacion == h.IdHabitacionNavigation.Id)?.PrecioHabitacion1 ?? 0;
+        return precio;
+    });
+    var totalComplementos = Model.ReservaComplemento.Sum(c => c.Cantidad * c.IdComplementoNavigation.Precio);
 }
 
-<h1 class="text-center">Factura de Reserva</h1>
-<hr />
+<div class="container border p-4 mb-5">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <img src="/images/Logo.png" alt="Logo" style="height: 120px;" />
+        </div>
+        <div class="col-md-6 text-end">
+            <h5>Fecha de Emisión: @fechaEmision</h5>
+        </div>
+    </div>
 
-<div class="container border p-4">
+    <h2 class="text-center">Resumen de Reserva – Crucero #@Model.Id</h2>
+    <hr />
+
+    <!-- Detalles generales del crucero -->
     <div class="row">
         <div class="col-md-6">
-            <h4>Detalles de la Reserva</h4>
-            <p><strong>Crucero:</strong> @Model.IdCruceroNavigation.Nombre</p>
+            <h4>Detalles del Crucero</h4>
+            <p><strong>Nombre:</strong> @Model.IdCruceroNavigation.Nombre</p>
             <p><strong>Puerto de Salida:</strong> @Model.IdCruceroNavigation.Itinerario.First().IdPuertoNavigation.Nombre</p>
             <p><strong>Puerto de Regreso:</strong> @Model.IdCruceroNavigation.Itinerario.Last().IdPuertoNavigation.Nombre</p>
-            <p><strong>El viaje Inicia:</strong> @Model.IdCruceroNavigation.FechaCrucero[0].FechaInicio</p> 
-            <p><strong>Fecha de Regreso:</strong> @(Model.IdCruceroNavigation.FechaCrucero[0].FechaInicio.AddDays(Model.IdCruceroNavigation.CantidadDias))</p>
+            <p><strong>Fecha Inicio:</strong> @Model.IdCruceroNavigation.FechaCrucero[0].FechaInicio.ToShortDateString()</p>
+            <p><strong>Fecha Fin:</strong> @(Model.IdCruceroNavigation.FechaCrucero[0].FechaInicio.AddDays(Model.IdCruceroNavigation.CantidadDias).ToShortDateString())</p>
         </div>
-        <div class="col-md-6 text-right">
-            <h4>Estado de Pago</h4>
+        <div class="col-md-6 text-end">
+            <h4>Estado del Pago</h4>
             <p><strong>Estado:</strong> @(Model.Saldopendiente > 0 ? "Pendiente" : "Pagado")</p>
             @if (Model.Saldopendiente > 0)
             {
-                <p><strong>Saldo Pendiente:</strong> @Model.Saldopendiente.ToString("C") </p>
-                <p>
-                    <strong>Fecha Límite de Pago:</strong> @(Model.IdCruceroNavigation.FechaCrucero[0].FechaLimitePago)
-                </p>
+                <p><strong>Monto Restante:</strong> @Model.Saldopendiente.ToString("C")</p>
+                <p><strong>Fecha Límite de Pago:</strong> @Model.IdCruceroNavigation.FechaCrucero[0].FechaLimitePago.ToShortDateString()</p>
             }
         </div>
     </div>
 
-    <hr />
-    <h4>Habitaciones</h4>
-    <table class="table">
+    <!-- Tabla de habitaciones -->
+    <h4 class="mt-4">Habitaciones Reservadas</h4>
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Habitación</th>
-                <th>Cantidad de Huéspedes</th>
+                <th>Huéspedes</th>
                 <th>Precio</th>
             </tr>
         </thead>
@@ -55,11 +70,17 @@
                 </tr>
             }
         </tbody>
-
+        <tfoot>
+            <tr>
+                <td colspan="2" class="text-end"><strong>Total Habitaciones:</strong></td>
+                <td class="text-end">@totalHabitaciones.ToString("C")</td>
+            </tr>
+        </tfoot>
     </table>
 
-    <h4>Complementos</h4>
-    <table class="table">
+    <!-- Tabla de complementos -->
+    <h4 class="mt-4">Complementos Adicionales</h4>
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Complemento</th>
@@ -69,27 +90,43 @@
             </tr>
         </thead>
         <tbody>
-           @foreach (var comp in Model.ReservaComplemento)
+            @foreach (var comp in Model.ReservaComplemento)
             {
-                var precio = comp.Cantidad * comp.IdComplementoNavigation.Precio;
+                var total = comp.Cantidad * comp.IdComplementoNavigation.Precio;
                 <tr>
                     <td>@comp.IdComplementoNavigation.Nombre</td>
                     <td>@comp.Cantidad</td>
                     <td>@comp.IdComplementoNavigation.Precio.ToString("C")</td>
-                    <td>@precio.ToString("C")</td>
-
+                    <td>@total.ToString("C")</td>
                 </tr>
             }
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total Complementos:</strong></td>
+                <td class="text-end">@totalComplementos.ToString("C")</td>
+            </tr>
+        </tfoot>
     </table>
 
-    <hr />
-    <h4>Resumen</h4>
-    <p><strong>Subtotal:</strong> @Model.SubTotal.ToString("C")</p>
-    <p><strong>Impuestos y Tarifas:</strong> @Model.Iva.ToString("C")</p>
-    <p><strong>Total:</strong> @Model.Total.ToString("C")</p>
+    <!-- Totales -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-end">
+            <p><strong>Subtotal:</strong> @Model.SubTotal.ToString("C")</p>
+            <p><strong>Impuestos y Tarifas:</strong> @Model.Iva.ToString("C")</p>
+            <p><strong>Precio Total:</strong> @Model.Total.ToString("C")</p>
+        </div>
+    </div>
 </div>
 
-<div class="mt-4">
+<!-- Botones -->
+<div class="text-center mb-4 no-print">
+    <a asp-action="GenerarFacturaPDF" asp-route-id="@Model.Id" class="btn btn-danger me-2">Descargar PDF</a>
     <a asp-action="Index" class="btn btn-secondary">Volver</a>
 </div>
+
+<!-- Pie de página -->
+<footer class="text-center text-muted mt-5">
+    <hr />
+    <p>Horizon Cruises | contacto@horizoncruises.com | +506 8888-8888 | www.horizoncruises.com</p>
+</footer>

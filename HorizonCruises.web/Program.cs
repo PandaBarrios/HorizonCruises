@@ -12,6 +12,7 @@ using HorizonCruises.web.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Libreria.Application.Config;
 using System.Globalization;
+using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -115,6 +116,7 @@ var cultureInfo = new CultureInfo("es-CR");
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
+
 var app = builder.Build();
 
 // Middleware
@@ -154,6 +156,9 @@ app.UseAntiforgery();
 //    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 //app.Run();
+
+//Importante para crear un PDF
+RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
 
 app.MapControllerRoute(
     name: "default",

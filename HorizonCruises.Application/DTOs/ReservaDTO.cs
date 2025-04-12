@@ -23,6 +23,12 @@ namespace HorizonCruises.Application.DTOs
 
         public bool Estado { get; set; }
 
+
+        /// <summary>
+        /// [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
+        /// </summary>
+
+
         [Display(Name = "Saldo Pendiente")]
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Saldopendiente { get; set; }
@@ -36,6 +42,9 @@ namespace HorizonCruises.Application.DTOs
 
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Total { get; set; }
+
+
+
 
         public virtual CruceroDTO IdCruceroNavigation { get; set; } = null!;
 
