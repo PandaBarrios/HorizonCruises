@@ -11,10 +11,10 @@ namespace HorizonCruises.Application.Services.Interfaces
     {
         Task<ICollection<ClienteDTO>> FindByDescriptionAsync(string description);
         Task<ICollection<ClienteDTO>> ListAsync();
-        Task<ClienteDTO> FindByIdAsync(string id);
-        Task<ClienteDTO> LoginAsync(string id, string password);
+        Task<ClienteDTO> FindByIdAsync(int id);
+        Task<ClienteDTO> LoginAsync(string email, string password);
         Task<string> AddAsync(ClienteDTO dto);
-        Task DeleteAsync(string id);
-        Task UpdateAsync(string id, ClienteDTO dto);
+        Task DeleteAsync(int id);
+        Task UpdateAsync(int id, ClienteDTO dto);
     }
 }

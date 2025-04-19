@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Libreria.Application.Config;
+namespace HorizonCruises.Application.Config;
 
 public class AppConfig
 {

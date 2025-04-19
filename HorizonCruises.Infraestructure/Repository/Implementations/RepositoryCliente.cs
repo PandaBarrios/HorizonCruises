@@ -4,6 +4,7 @@ using HorizonCruises.Infraestructure.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -27,7 +28,7 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             return entity.CorreoElectronico;
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(int id)
         {
             var @object = await FindByIdAsync(id);
             _context.Remove(@object);
@@ -43,7 +44,7 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             return collection;
         }
 
-        public async Task<Usuario> FindByIdAsync(string id)
+        public async Task<Usuario> FindByIdAsync(int id)
         {
             var @object = await _context.Set<Usuario>().FindAsync(id);
 
@@ -58,11 +59,11 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             return collection;
         }
 
-        public async Task<Usuario> LoginAsync(string id, string password)
+        public async Task<Usuario> LoginAsync(string email, string password)
         {
             var @object = await _context.Set<Usuario>()
                             .Include(b => b.IdRolNavigation)
-                            .Where(p => p.CorreoElectronico == id && p.Contrasena == password)
+                            .Where(p => p.CorreoElectronico == email && p.Contrasena == password)
                             .FirstOrDefaultAsync();
 
             return @object!; // <-- sin el ! obligatorio

@@ -16,15 +16,18 @@ namespace HorizonCruises.web.Controllers
         private readonly IServiseItinerario _serviceItinerario;
         private readonly IServicePuerto _servicePuerto;
         private readonly IServiceFechaCrucero _serviceFechaCrucero;
+
+        private readonly IServiceReserva _serviceReserva;
         private readonly ILogger<ServiceCrucero> _logger;
 
-        public CruceroController(IServiceCrucero serviceCrucero, IServiceBarco serviceBarco, IServiseItinerario serviceItinerario, IServicePuerto servicePuerto, IServiceFechaCrucero serviceFechaCrucero, ILogger<ServiceCrucero> logger)
+        public CruceroController(IServiceCrucero serviceCrucero, IServiceBarco serviceBarco, IServiseItinerario serviceItinerario, IServicePuerto servicePuerto, IServiceFechaCrucero serviceFechaCrucero, IServiceReserva serviceReserva, ILogger<ServiceCrucero> logger)
         {
             _serviceCrucero = serviceCrucero;
             _serviceBarco = serviceBarco;
             _serviceItinerario = serviceItinerario;
             _servicePuerto = servicePuerto;
             _serviceFechaCrucero = serviceFechaCrucero;
+            _serviceReserva = serviceReserva;
             _logger = logger;
         }
 
@@ -187,6 +190,8 @@ namespace HorizonCruises.web.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
+        
 
     }
 }

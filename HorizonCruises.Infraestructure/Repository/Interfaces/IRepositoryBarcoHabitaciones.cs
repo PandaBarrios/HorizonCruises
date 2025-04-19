@@ -11,5 +11,6 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
     {
         Task<ICollection<BarcoHabitaciones>> ListAsync();
         Task<BarcoHabitaciones> FindByIdAsync(int id);
+        Task<ICollection<BarcoHabitaciones>> GetHabitacionesByBarcoAsync(int idBarco);
     }
 }

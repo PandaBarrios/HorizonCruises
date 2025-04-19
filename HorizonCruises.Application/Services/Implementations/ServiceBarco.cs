@@ -31,11 +31,8 @@ namespace HorizonCruises.Application.Services.Implementations
 
         public async Task<ICollection<BarcoDTO>> ListAsync()
         {
-            //Obtener datos del repositorio 
             var list = await _repository.ListAsync();
-            // Map List<Barco> a ICollection<BarcoDTO> 
             var collection = _mapper.Map<ICollection<BarcoDTO>>(list);
-            // Return lista 
             return collection;
         }
 
