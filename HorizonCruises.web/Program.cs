@@ -10,9 +10,9 @@ using Serilog;
 using System.Text;
 using HorizonCruises.web.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Libreria.Application.Config;
 using System.Globalization;
 using Rotativa.AspNetCore;
+using HorizonCruises.Application.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 

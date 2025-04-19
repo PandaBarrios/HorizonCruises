@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Interfaces;
+using HorizonCruises.Infraestructure.Models;
 using HorizonCruises.Infraestructure.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -28,14 +29,20 @@ namespace HorizonCruises.Application.Services.Implementations
             return objectMapped;
         }
 
-        public async Task<ICollection<BarcoHabitacionesDTO>> ListAsync()
+        //Obtiene las habitaciones de un barco en especifico
+        public async Task<ICollection<BarcoHabitacionesDTO>> GetHabitacionesByBarcoAsync(int idBarco)
         {
-            //Obtener datos del repositorio 
-            var list = await _repository.ListAsync();
-            // Map List<BarcoHabitaciones> a ICollection<BarcoHabitacionesDTO> 
+            var list = await _repository.GetHabitacionesByBarcoAsync(idBarco);
             var collection = _mapper.Map<ICollection<BarcoHabitacionesDTO>>(list);
-            // Return lista 
             return collection;
         }
+        public async Task<ICollection<BarcoHabitacionesDTO>> ListAsync()
+        {
+            var list = await _repository.ListAsync();
+            var collection = _mapper.Map<ICollection<BarcoHabitacionesDTO>>(list);
+            return collection;
+        }
+
+       
     }
 }

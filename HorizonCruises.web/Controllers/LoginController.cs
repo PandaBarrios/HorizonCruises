@@ -57,11 +57,13 @@ namespace HorizonCruises.web.Controllers
                 return View("Index");
             }
 
-            //Claim almacena información del usuario como nombre, rol y otros. Esto se guardara en una cokie
+            //Claim almacena información del usuario como nombre, rol y otros. Esto se guardará en una cookie
             List<Claim> claims = new List<Claim>() {
-                new Claim(ClaimTypes.Name, usuarioDTO.Nombre),
-                new Claim(ClaimTypes.Role, usuarioDTO.IdRolNavigation.Nombre!)
+                 new Claim(ClaimTypes.Name, usuarioDTO.Nombre),
+                 new Claim(ClaimTypes.Role, usuarioDTO.IdRolNavigation.Nombre!),
+                 new Claim("IdUsuario", usuarioDTO.Id.ToString()) // ← Agrega la ID del usuario
             };
+
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             AuthenticationProperties properties = new AuthenticationProperties()

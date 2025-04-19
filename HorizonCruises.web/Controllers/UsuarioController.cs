@@ -65,14 +65,14 @@ namespace HorizonCruises.web.Controllers
 
 
         // GET: UsuarioController/Details/5
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details(int id)
         {
             var @object = await _serviceUsuario.FindByIdAsync(id);
             return View(@object);
         }
 
         // GET: UsuarioController/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(int id)
         {
             var @object = await _serviceUsuario.FindByIdAsync(id);
             return View(@object);
@@ -81,14 +81,14 @@ namespace HorizonCruises.web.Controllers
         // POST: UsuarioController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, ClienteDTO dto)
+        public async Task<IActionResult> Edit(int id, ClienteDTO dto)
         {
             await _serviceUsuario.UpdateAsync(id, dto);
             return RedirectToAction("Index");
         }
 
         // GET: UsuarioController/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
             var @object = await _serviceUsuario.FindByIdAsync(id);
             return View(@object);
@@ -97,7 +97,7 @@ namespace HorizonCruises.web.Controllers
         // POST: UsuarioController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string id, IFormCollection collection)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             await _serviceUsuario.DeleteAsync(id);
             return RedirectToAction("Index");

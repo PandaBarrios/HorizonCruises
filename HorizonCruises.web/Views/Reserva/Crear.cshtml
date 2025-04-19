@@ -1,0 +1,94 @@
+﻿@model HorizonCruises.web.ViewModels.ViewModelReserva
+
+@{
+    ViewData["Title"] = "Crear Reserva";
+    var fechaCrucero = Model.Reserva.IdCruceroNavigation.FechaCrucero[0];
+}
+
+<h2 class="mb-4">@Model.Reserva.IdCruceroNavigation.Nombre</h2>
+
+<!-- Detalles del crucero y cliente -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <img src="@Url.Action("ObtenerImagen", "Crucero", new { id = @Model.Reserva.IdCruceroNavigation.Id })"
+            class="card-img-top" alt="Imagen del crucero" style="height: 300px; object-fit: cover;">
+            <div class="card-body">
+                <h5 class="card-title">Detalles del Crucero</h5>
+                <p><i class="bi bi-geo-alt-fill"></i> <strong>Puerto de Salida:</strong> @Model.Reserva.IdCruceroNavigation.Itinerario.First().IdPuertoNavigation.Nombre</p>
+                <p><i class="bi bi-geo-alt"></i> <strong>Puerto de Regreso:</strong> @Model.Reserva.IdCruceroNavigation.Itinerario.Last().IdPuertoNavigation.Nombre</p>
+                <p><i class="bi bi-calendar-event"></i> <strong>Fecha Inicio:</strong> @fechaCrucero.FechaInicio.ToShortDateString()</p>
+                <p><i class="bi bi-calendar-check"></i> <strong>Fecha Fin:</strong> @(fechaCrucero.FechaInicio.AddDays(Model.Reserva.IdCruceroNavigation.CantidadDias).ToShortDateString())</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Datos del Cliente</h5>
+                <p><i class="bi bi-person-fill"></i> <strong>Nombre:</strong> @Model.Reserva.IdUsuarioNavigation.Nombre</p>
+                <p><i class="bi bi-envelope-fill"></i> <strong>Correo:</strong> @Model.Reserva.IdUsuarioNavigation.CorreoElectronico</p>
+                <p><i class="bi bi-calendar-heart"></i> <strong>Fecha de Reserva:</strong> @Model.Reserva.FechaReserva.ToShortDateString()</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario -->
+<form asp-action="Crear" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <h4 class="mb-3">Selecciona las habitaciones</h4>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tipo</th>
+                    <th>Capacidad</th>
+                    <th>Descripción</th>
+                    <th>Tamaño (m²)</th>
+                    <th>Precio</th>
+                    <th>Disponibles</th>
+                    <th class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var habitacion in Model.Habitaciones)
+                {
+                    var precios = habitacion.IdHabitacionNavigation.PrecioHabitacion;
+                    var precioAplicable = precios.FirstOrDefault(p => p.IdCruceroFecha == fechaCrucero.Id);
+
+                    <tr>
+                        <td>@habitacion.IdHabitacionNavigation.Nombre</td>
+                        <td>@habitacion.IdHabitacionNavigation.Tipo</td>
+                        <td>@habitacion.IdHabitacionNavigation.CantidadMaximaHuespedes</td>
+                        <td>@habitacion.IdHabitacionNavigation.Descripcion</td>
+                        <td>@habitacion.IdHabitacionNavigation.Tamano</td>
+                        <td>
+                            @(precioAplicable != null ? precioAplicable.PrecioHabitacion1.ToString() : "N/D")
+                        </td>
+                        <td>@habitacion.TotalHabitacionesDisponibles</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-plus-circle"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-group mb-4">
+        <input type="submit" value="Confirmar Reserva" class="btn btn-primary btn-lg" />
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

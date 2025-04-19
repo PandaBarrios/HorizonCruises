@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using HorizonCruises.Application.Config;
 using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Interfaces;
 using HorizonCruises.Application.Utils;
 using HorizonCruises.Infraestructure.Models;
 using HorizonCruises.Infraestructure.Repository.Interfaces;
-using Libreria.Application.Config;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,7 @@ namespace HorizonCruises.Application.Services.Implementations
             return await _repository.AddAsync(objectMapped);
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(int id)
         {
             await _repository.DeleteAsync(id);
         }
@@ -55,7 +55,7 @@ namespace HorizonCruises.Application.Services.Implementations
             return collection;
         }
 
-        public async Task<ClienteDTO> FindByIdAsync(string id)
+        public async Task<ClienteDTO> FindByIdAsync(int id)
         {
             var @object = await _repository.FindByIdAsync(id);
             var objectMapped = _mapper.Map<ClienteDTO>(@object);
@@ -70,7 +70,7 @@ namespace HorizonCruises.Application.Services.Implementations
             return collection;
         }
 
-        public async Task<ClienteDTO> LoginAsync(string id, string password)
+        public async Task<ClienteDTO> LoginAsync(string email, string password)
         {
             ClienteDTO usuarioDTO = null!;
 
@@ -82,7 +82,7 @@ namespace HorizonCruises.Application.Services.Implementations
            
 
 
-            var @object = await _repository.LoginAsync(id, passwordEncrypted);
+            var @object = await _repository.LoginAsync(email, passwordEncrypted);
 
             if (@object != null)
             {
@@ -92,7 +92,7 @@ namespace HorizonCruises.Application.Services.Implementations
             return usuarioDTO;
         }
 
-        public async Task UpdateAsync(string id, ClienteDTO dto)
+        public async Task UpdateAsync(int id, ClienteDTO dto)
         {
             var @object = await _repository.FindByIdAsync(id);
             // source, destination

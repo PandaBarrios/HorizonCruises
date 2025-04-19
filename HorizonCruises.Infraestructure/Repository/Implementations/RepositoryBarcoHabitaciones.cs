@@ -43,7 +43,10 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             return await _context.BarcoHabitaciones
                 .Where(bh => bh.IdBarco == idBarco)
                 .Include(bh => bh.IdHabitacionNavigation)
+                    .ThenInclude(h => h.PrecioHabitacion)
+                .OrderBy(bh => bh.IdHabitacionNavigation.Nombre)
                 .ToListAsync();
         }
+
     }
 }
