@@ -48,6 +48,8 @@ public partial class HorizonCruisesContext : DbContext
 
     public virtual DbSet<Usuario> Usuario { get; set; }
 
+    public virtual DbSet<UsuarioHuesped> UsuarioHuesped { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseCollation("Latin1_General_CI_AI");
@@ -422,6 +424,26 @@ public partial class HorizonCruisesContext : DbContext
             entity.HasOne(d => d.IdRolNavigation).WithMany(p => p.Usuario)
                 .HasForeignKey(d => d.IdRol)
                 .HasConstraintName("FK__Usuario__id_rol__6E01572D");
+        });
+
+        modelBuilder.Entity<UsuarioHuesped>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToTable("Usuario_Huesped");
+
+            entity.Property(e => e.IdHuesped).HasColumnName("id_huesped");
+            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
+
+            entity.HasOne(d => d.IdHuespedNavigation).WithMany()
+                .HasForeignKey(d => d.IdHuesped)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Usuario_Huesped_Huesped");
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
+                .HasForeignKey(d => d.IdUsuario)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Usuario_Huesped_Usuario");
         });
 
         OnModelCreatingPartial(modelBuilder);

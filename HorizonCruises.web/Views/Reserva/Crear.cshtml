@@ -12,7 +12,7 @@
     <div class="col-md-6">
         <div class="card shadow-sm">
             <img src="@Url.Action("ObtenerImagen", "Crucero", new { id = @Model.Reserva.IdCruceroNavigation.Id })"
-            class="card-img-top" alt="Imagen del crucero" style="height: 300px; object-fit: cover;">
+                 class="card-img-top" alt="Imagen del crucero" style="height: 300px; object-fit: cover;">
             <div class="card-body">
                 <h5 class="card-title">Detalles del Crucero</h5>
                 <p><i class="bi bi-geo-alt-fill"></i> <strong>Puerto de Salida:</strong> @Model.Reserva.IdCruceroNavigation.Itinerario.First().IdPuertoNavigation.Nombre</p>
@@ -34,7 +34,6 @@
     </div>
 </div>
 
-<!-- Formulario -->
 <form asp-action="Crear" method="post">
     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
@@ -59,19 +58,17 @@
                 {
                     var precios = habitacion.IdHabitacionNavigation.PrecioHabitacion;
                     var precioAplicable = precios.FirstOrDefault(p => p.IdCruceroFecha == fechaCrucero.Id);
-
                     <tr>
                         <td>@habitacion.IdHabitacionNavigation.Nombre</td>
                         <td>@habitacion.IdHabitacionNavigation.Tipo</td>
                         <td>@habitacion.IdHabitacionNavigation.CantidadMaximaHuespedes</td>
                         <td>@habitacion.IdHabitacionNavigation.Descripcion</td>
                         <td>@habitacion.IdHabitacionNavigation.Tamano</td>
-                        <td>
-                            @(precioAplicable != null ? precioAplicable.PrecioHabitacion1.ToString() : "N/D")
-                        </td>
+                        <td>@(precioAplicable != null ? $"₡{precioAplicable.PrecioHabitacion1:N2}" : "N/D")</td>
                         <td>@habitacion.TotalHabitacionesDisponibles</td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-outline-success">
+                            <button type="button" class="btn btn-sm btn-outline-success"
+                                    onclick="abrirModal('@habitacion.IdHabitacionNavigation.Id', @habitacion.TotalHabitacionesDisponibles)">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
                         </td>
@@ -80,6 +77,52 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalCantidad" tabindex="-1" aria-labelledby="modalCantidadLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCantidadLabel">Agregar habitación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="habitacion-id" />
+                    <div class="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad de habitaciones</label>
+                        <input type="number" class="form-control" id="cantidad" min="1" />
+                        <div class="form-text text-danger d-none" id="error-cantidad">No puedes seleccionar más de las disponibles.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmarAgregar()">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla habitaciones seleccionadas -->
+    <h5 class="mt-4">Tus habitaciones seleccionadas:</h5>
+    <table class="table table-bordered" id="tabla-seleccionadas">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="mt-3 text-end">
+        <h5>Total: <span id="total-habitaciones">₡0.00</span></h5>
+    </div>
+
+    <input type="hidden" name="HabitacionesSeleccionadas" id="habitacionesJson" />
+
+
 
     <div class="form-group mb-4">
         <input type="submit" value="Confirmar Reserva" class="btn btn-primary btn-lg" />
@@ -91,4 +134,108 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        let habitacionesSeleccionadas = [];
+        const disponibilidadPorHabitacion = {
+        @foreach (var h in Model.Habitaciones)
+        {
+            <text>"@h.IdHabitacionNavigation.Id": @h.TotalHabitacionesDisponibles,</text>
+        }
+        };
+
+        function abrirModal(idHabitacion, disponibles, editar = false) {
+            document.getElementById('habitacion-id').value = idHabitacion;
+            const cantidadInput = document.getElementById('cantidad');
+            const existente = habitacionesSeleccionadas.find(h => h.id === idHabitacion);
+
+            cantidadInput.value = editar && existente ? existente.cantidad : 1;
+            cantidadInput.max = disponibles;
+            cantidadInput.setAttribute("data-editando", editar);
+
+            document.getElementById('error-cantidad').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('modalCantidad')).show();
+        }
+
+        function confirmarAgregar() {
+            const id = document.getElementById('habitacion-id').value;
+            const cantidad = parseInt(document.getElementById('cantidad').value);
+            const max = parseInt(document.getElementById('cantidad').max);
+            const editando = document.getElementById('cantidad').getAttribute("data-editando") === "true";
+            const nombre = document.querySelector(`button[onclick*="abrirModal('${id}'"]`)
+                           ?.closest("tr")?.children[0]?.textContent?.trim() ?? "Desconocido";
+
+            if (cantidad > max || cantidad < 1) {
+                document.getElementById('error-cantidad').classList.remove('d-none');
+                return;
+            }
+
+            if (editando) {
+                const index = habitacionesSeleccionadas.findIndex(h => h.id === id);
+                if (index >= 0) habitacionesSeleccionadas[index].cantidad = cantidad;
+            } else {
+                const yaExiste = habitacionesSeleccionadas.find(h => h.id === id);
+                if (yaExiste) {
+                     yaExiste.cantidad += cantidad;
+                } else {
+                    const fila = document.querySelector(`button[onclick*="abrirModal('${id}'"]`)?.closest("tr");
+                    const precioTexto = fila?.children[5]?.textContent?.replace(/[₡]/g,'').trim() ?? "0";
+                    const precioUnitario = parseFloat(precioTexto) || 0;
+
+
+                    console.log(`Habitación ID: ${id}, Precio leído: ${precioTexto}`);
+
+                    habitacionesSeleccionadas.push({ id, nombre, cantidad, precioUnitario });
+                }       
+
+            }
+
+            actualizarVistaSeleccionadas();
+            bootstrap.Modal.getInstance(document.getElementById('modalCantidad')).hide();
+        }
+
+        function actualizarVistaSeleccionadas() {
+            const tabla = document.querySelector('#tabla-seleccionadas tbody');
+            tabla.innerHTML = '';
+
+            habitacionesSeleccionadas.forEach(h => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${h.id}</td>
+                    <td>${h.nombre}</td>
+                    <td>${h.cantidad}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="editarHabitacion('${h.id}')">Editar</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHabitacion('${h.id}')">Eliminar</button>
+                    </td>
+                `;
+                tabla.appendChild(fila);
+            });
+
+            document.getElementById('habitacionesJson').value = JSON.stringify(habitacionesSeleccionadas);
+            actualizarTotal();
+        }
+
+
+        function eliminarHabitacion(id) {
+            habitacionesSeleccionadas = habitacionesSeleccionadas.filter(h => h.id !== id);
+            actualizarVistaSeleccionadas();
+        }
+
+        function editarHabitacion(id) {
+            const disponibles = disponibilidadPorHabitacion[id] || 10;
+            abrirModal(id, disponibles, true);
+        }
+
+        function actualizarTotal() {
+            let total = 0;
+            habitacionesSeleccionadas.forEach(h => {
+                total += h.precioUnitario * h.cantidad;
+            });
+
+            document.getElementById('total-habitaciones').textContent = `₡${total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+        }
+
+    </script>
 }
+

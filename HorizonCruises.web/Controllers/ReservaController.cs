@@ -12,7 +12,6 @@ using System.Runtime.CompilerServices;
 
 namespace HorizonCruises.web.Controllers
 {
-    [Authorize(Roles = "Administrador")]
     public class ReservaController : Controller
     {
         private readonly IServiceReserva _serviceReserva;
@@ -31,12 +30,15 @@ namespace HorizonCruises.web.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> IndexReserva()
         {
             var collection = await _serviceReserva.ListAsync();
             return View(collection);
 
         }
+
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> DetailsReserva(int? id)
         {
             try
@@ -61,6 +63,7 @@ namespace HorizonCruises.web.Controllers
 
         }
 
+        [Authorize(Roles = "Administrador")]
         // Acción que genera un archivo PDF basado en una vista Razor
         public async Task<IActionResult> GenerarFacturaPDF(int? id)
         {
