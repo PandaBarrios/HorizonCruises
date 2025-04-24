@@ -18,15 +18,19 @@ namespace HorizonCruises.web.Controllers
         private readonly IServiceCrucero _serviceCrucero;
         private readonly IServiceCliente _serviceCliente;
         private readonly IServiceBarcoHabitaciones _serviceBarcoHabitaciones;
+        private readonly IServiceUsuarioHuesped _serviceUsuarioHuesped;
+        private readonly IServiceComplemento _serviceComplemento;
 
         private readonly ILogger<ServiceReserva> _logger;
 
-        public ReservaController(IServiceReserva serviceReserva, IServiceCrucero serviceCrucero, IServiceCliente serviceCliente, IServiceBarcoHabitaciones serviceBarcoHabitaciones, ILogger<ServiceReserva> logger)
+        public ReservaController(IServiceReserva serviceReserva, IServiceCrucero serviceCrucero, IServiceCliente serviceCliente, IServiceBarcoHabitaciones serviceBarcoHabitaciones, IServiceUsuarioHuesped serviceUsuarioHuesped, IServiceComplemento serviceComplemento, ILogger<ServiceReserva> logger)
         {
             _serviceReserva = serviceReserva;
             _serviceCrucero = serviceCrucero;
             _serviceCliente = serviceCliente;
             _serviceBarcoHabitaciones = serviceBarcoHabitaciones;
+            _serviceUsuarioHuesped = serviceUsuarioHuesped;
+            _serviceComplemento = serviceComplemento;
             _logger = logger;
         }
 
@@ -103,6 +107,10 @@ namespace HorizonCruises.web.Controllers
 
             var habitacionesDTO = await _serviceBarcoHabitaciones.GetHabitacionesByBarcoAsync(crucero.IdBarco);
 
+            var huespedesDTO = await _serviceUsuarioHuesped.GetHuespedByUsuarioAsync(idUsuario);
+
+            var complementoDTO = await _serviceComplemento.ListAsync();
+
             var reserva = new ReservaDTO
             {
                 FechaReserva = DateOnly.FromDateTime(DateTime.Now),
@@ -117,15 +125,11 @@ namespace HorizonCruises.web.Controllers
             {
                 Reserva = reserva,
                 Habitaciones = habitacionesDTO.ToList(),
+                Huespedes = huespedesDTO.ToList(),
+                Complementos = complementoDTO.ToList(),
             };
 
             return View(viewModel);
         }
-
-
-
-
     }
-
-
 }
