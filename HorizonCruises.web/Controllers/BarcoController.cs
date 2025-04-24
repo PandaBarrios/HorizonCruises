@@ -26,48 +26,39 @@ namespace HorizonCruises.web.Controllers
             return View(collection);
         }
 
-        public async Task<ActionResult> IndexAdmin(int? page)
+        public async Task<IActionResult> IndexAdmin(int? page)
         {
             var collection = await _serviceBarco.ListAsync();
             return View(collection.ToPagedList(page ?? 1, 5));
         }
 
-        // GET: BarcoController/Details/5
-        public async Task<ActionResult> Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var @object = await _serviceBarco.FindByIdAsync(id);
-            return View(@object);
+            var barco = await _serviceBarco.FindByIdAsync(id);
+            return View(barco);
         }
 
-        // GET: BarcoController/Create
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            // Obtener las habitaciones desde la base de datos (en este ejemplo se asume que "Nombre" es el nombre de la habitación)
-            var habitaciones = await _serviceHabitacion.ListAsync(); // Aquí obtienes una lista de habitaciones
-            ViewBag.Habitaciones = new SelectList(habitaciones, "Id", "Nombre"); // Pasamos Id y Nombre de la habitación
-
-            return View();
+            var habitaciones = await _serviceHabitacion.ListAsync();
+            ViewBag.Habitaciones = new SelectList(habitaciones, "Id", "Nombre");
+            return View(new BarcoDTO());
         }
 
-        // Crear un barco
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BarcoDTO dto)
         {
-            if (dto == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+            var habitaciones = await _serviceHabitacion.ListAsync();
+            ViewBag.Habitaciones = new SelectList(habitaciones, "Id", "Nombre");
 
-            // Validación del modelo
-            if (!ModelState.IsValid)
+            if (dto == null || !ModelState.IsValid)
             {
-                ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
                 return View(dto);
             }
 
-            // Verificar si hay habitaciones duplicadas
-            if (dto.BarcoHabitaciones != null && dto.BarcoHabitaciones.Any())
+            if (dto.BarcoHabitaciones != null)
             {
                 var habitacionesDuplicadas = dto.BarcoHabitaciones
                     .GroupBy(h => h.IdHabitacion)
@@ -78,21 +69,20 @@ namespace HorizonCruises.web.Controllers
                 if (habitacionesDuplicadas.Any())
                 {
                     ModelState.AddModelError("BarcoHabitaciones", "No puedes agregar la misma habitación más de una vez.");
-                    ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
                     return View(dto);
                 }
             }
 
-            // Guardar el barco si no hay errores
             var result = await _serviceBarco.AddAsync(dto);
             if (!result)
             {
-                return BadRequest("No se pudo crear el barco.");
+                ModelState.AddModelError("", "No se pudo crear el barco.");
+                return View(dto);
             }
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(IndexAdmin));
         }
-
+    
         // GET: BarcoController/Edit/5
         public async Task<IActionResult> Edit(int id)
         {

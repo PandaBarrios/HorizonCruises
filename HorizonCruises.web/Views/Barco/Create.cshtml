@@ -1,133 +1,127 @@
 ﻿@model HorizonCruises.Application.DTOs.BarcoDTO
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear Barco";
+    var habitacionesList = ViewBag.Habitaciones as SelectList;
 }
 
 <h1 class="text-center my-4">Crear Barco</h1>
-
-<h4 class="text-center">Detalles del Barco</h4>
 <hr />
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <form asp-action="Create" method="post" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-                <!-- Nombre del Barco -->
-                <div class="form-group mb-3">
-                    <label asp-for="Nombre" class="control-label"></label>
-                    <input asp-for="Nombre" class="form-control" placeholder="Nombre del barco" />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
-                </div>
-
-                <!-- Descripción del Barco -->
-                <div class="form-group mb-3">
-                    <label asp-for="Descripcion" class="control-label"></label>
-                    <input asp-for="Descripcion" class="form-control" placeholder="Descripción del barco" />
-                    <span asp-validation-for="Descripcion" class="text-danger"></span>
-                </div>
-
-                <!-- Capacidad de Huespedes -->
-                <div class="form-group mb-3">
-                    <label asp-for="CapacidadHuespedes" class="control-label"></label>
-                    <input asp-for="CapacidadHuespedes" class="form-control" placeholder="Capacidad de huespedes" />
-                    <span asp-validation-for="CapacidadHuespedes" class="text-danger"></span>
-                </div>
-
-                <!-- Sección de Habitaciones -->
-                <h4 class="mt-4 mb-3">Habitaciones</h4>
-                <div id="habitacionesContainer">
-                    <button type="button" class="btn btn-success mb-3" onclick="agregarHabitacion()">Agregar Habitación</button>
-
-                    <!-- Aquí renderizamos la lista de habitaciones existentes -->
-                    <div id="habitacionesList">
-                        <!-- Las habitaciones serán cargadas dinámicamente desde el ViewBag -->
-                    </div>
-                </div>
-
-                <div class="form-group text-center mt-4">
-                    <input type="submit" value="Crear Barco" class="btn btn-primary" />
-                </div>
-            </form>
+        <!-- Nombre -->
+        <div class="form-group mb-3">
+            <label asp-for="Nombre" class="form-label"></label>
+            <input asp-for="Nombre" class="form-control" />
+            <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
-    </div>
-</div>
 
-<!-- Contenedor de Toast de Notificación (invisible por defecto) -->
-<div id="toast" class="toast-container position-fixed top-0 start-50 translate-middle-x
-">
-    <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto">Error</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        <!-- Descripción -->
+        <div class="form-group mb-3">
+            <label asp-for="Descripcion" class="form-label"></label>
+            <input asp-for="Descripcion" class="form-control" />
+            <span asp-validation-for="Descripcion" class="text-danger"></span>
         </div>
-        <div class="toast-body">
-            ¡No puedes agregar la misma habitación más de una vez!
-        </div>
-    </div>
-</div>
 
-<div class="text-center mt-4">
-    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+        <!-- Capacidad de Huespedes -->
+        <div class="form-group mb-3">
+            <label asp-for="CapacidadHuespedes" class="form-label"></label>
+            <input asp-for="CapacidadHuespedes" class="form-control" />
+            <span asp-validation-for="CapacidadHuespedes" class="text-danger"></span>
+        </div>
+
+        <!-- Habitaciones -->
+        <h4 class="mt-4">Habitaciones</h4>
+        <button type="button" class="btn btn-success btn-sm mb-3" onclick="agregarHabitacion()">Agregar Habitación</button>
+        <div id="habitacionesList"></div>
+
+        <!-- Botón Guardar -->
+        <div class="text-center mt-4">
+            <input type="submit" value="Crear Barco" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let form = document.querySelector("form");
-        form.addEventListener("submit", function (event) {
-            if (!validarHabitacionesUnicas()) {
-                event.preventDefault(); // Evita que se envíe el formulario si hay duplicados
-                mostrarToast(); // Muestra el toast
+    <script>
+        let index = 0;
+
+        // Lista completa de habitaciones desde el servidor
+        const habitacionesDisponibles = [
+        @foreach (var hab in habitacionesList)
+        {
+            <text>{ value: "@hab.Value", text: "@hab.Text" },</text>
+        }
+        ];
+
+        function agregarHabitacion() {
+            const container = document.getElementById("habitacionesList");
+
+            // Obtener valores de habitaciones ya seleccionadas
+            const selects = document.querySelectorAll(".habitacion-select");
+            const seleccionadas = Array.from(selects).map(s => s.value);
+
+            // Filtrar las habitaciones aún disponibles
+            const disponibles = habitacionesDisponibles.filter(h => !seleccionadas.includes(h.value));
+
+            if (disponibles.length === 0) {
+                alert("Ya no hay más habitaciones disponibles para agregar.");
+                return;
+            }
+
+            const div = document.createElement("div");
+            div.classList.add("row", "mb-2", "align-items-end");
+
+            let opciones = `<option value="">Seleccione una habitación</option>`;
+            disponibles.forEach(h => {
+                opciones += `<option value="${h.value}">${h.text}</option>`;
+            });
+
+            div.innerHTML = `
+                <div class="col-md-6">
+                    <select class="form-select habitacion-select" name="BarcoHabitaciones[${index}].IdHabitacion" required>
+                        ${opciones}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="BarcoHabitaciones[${index}].TotalHabitacionesDisponibles" class="form-control" placeholder="Total disponibles" min="1" required />
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger" onclick="eliminarHabitacion(this)">X</button>
+                </div>
+            `;
+
+            container.appendChild(div);
+            index++;
+        }
+
+        // Eliminar fila de habitación y permitir volver a seleccionar esa opción
+        function eliminarHabitacion(btn) {
+            btn.closest('.row').remove();
+        }
+
+        // Validación antes de enviar el formulario
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const selects = document.querySelectorAll(".habitacion-select");
+            const values = [];
+
+            for (let select of selects) {
+                const value = select.value;
+                if (values.includes(value)) {
+                    e.preventDefault();
+                    alert("No puedes seleccionar la misma habitación más de una vez.");
+                    return false;
+                }
+                if (value) {
+                    values.push(value);
+                }
             }
         });
-    });
-
-    function validarHabitacionesUnicas() {
-        let selects = document.querySelectorAll("select[name^='BarcoHabitaciones']");
-        let ids = new Set();
-
-        for (let select of selects) {
-            let id = select.value;
-            if (ids.has(id)) {
-                return false; // Si ya existe, retorna falso
-            }
-            ids.add(id);
-        }
-        return true; // Si no hay duplicados, permite enviar el formulario
-    }
-
-    function mostrarToast() {
-        var toast = new bootstrap.Toast(document.getElementById('notificationToast'));
-        toast.show(); // Muestra el toast
-    }
-
-    function agregarHabitacion() {
-        let container = document.getElementById("habitacionesList");
-        let index = document.querySelectorAll(".habitacion-item").length;
-
-        let div = document.createElement("div");
-        div.classList.add("habitacion-item");
-        div.innerHTML = `
-            <div class="form-group mb-3">
-                <label>Habitación</label>
-                <select name="BarcoHabitaciones[${index}].IdHabitacion" class="form-control">
-    @foreach (var habitacion in ViewBag.Habitaciones)
-    {
-                            <option value="@habitacion.Value">@habitacion.Text</option>
-    }
-                </select>
-                <input type="number" name="BarcoHabitaciones[${index}].TotalHabitacionesDisponibles" placeholder="Cantidad disponible" class="form-control mt-2" />
-                <button type="button" class="btn btn-danger mt-2" onclick="this.parentElement.remove()">Eliminar</button>
-            </div>
-        `;
-        container.appendChild(div);
-    }
-</script>
+    </script>
+}
