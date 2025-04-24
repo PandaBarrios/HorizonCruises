@@ -7,8 +7,8 @@ namespace HorizonCruises.web.ViewModels
     public class ViewModelReserva
     {
         public ReservaDTO Reserva { get; set; } = new ReservaDTO();
-
-        [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public List<BarcoHabitacionesDTO> Habitaciones { get; set; } = new();
+        public List<UsuarioHuespedDTO> Huespedes { get; set; } = new();
+        public List<ComplementoDTO> Complementos { get; set; } = new();
     }
 }

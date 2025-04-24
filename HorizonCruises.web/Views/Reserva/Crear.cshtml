@@ -122,6 +122,113 @@
 
     <input type="hidden" name="HabitacionesSeleccionadas" id="habitacionesJson" />
 
+    <!-- Huespedes -->
+    <h4 class="mb-3">Selecciona tus acompañantes</h4>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Fecha de nacimiento</th>
+                    <th>Correo</th>
+                    <th>Pasaporte</th>
+                    <th>Genero</th>
+                    <th class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var huesped in Model.Huespedes)
+                {
+                     <tr>
+                        <td>@huesped.IdHuespedNavigation.Nombre @huesped.IdHuespedNavigation.Apellido </td>
+                        <td>@huesped.IdHuespedNavigation.FechaNacimiento</td>
+                        <td>@huesped.IdHuespedNavigation.Correo</td>
+                        <td>@huesped.IdHuespedNavigation.Pasaporte</td>
+                        <td>
+                            @(huesped.IdHuespedNavigation?.Genero == true ? "Masculino" : "Femenino")
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-success"
+                                    onclick="agregarHuesped('@huesped.IdHuesped', '@huesped.IdHuespedNavigation.Nombre @huesped.IdHuespedNavigation.Apellido', '@huesped.IdHuespedNavigation.Correo')">
+                                <i class="bi bi-plus-circle"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h5 class="mt-4">Tus acompañantes seleccionados:</h5>
+    <table class="table table-bordered" id="tabla-huespedes-seleccionados">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <input type="hidden" name="HuespedesSeleccionados" id="huespedesJson" />
+
+    <!-- Huespedes -->
+    <h4 class="mb-3">Opciones para complementar su estadia</h4>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Aplica a:</th>
+                    <th class="text-center">Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var complemento in Model.Complementos)
+                {
+                    <tr>
+                        <td>@complemento.Nombre </td>
+                        <td>@complemento.Descripcion</td>
+                        <td>@complemento.Precio.ToString("C")</td>
+                        <td>
+                            @(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-success"
+                                    onclick="agregarComplemento('@complemento.Nombre', '@complemento.Descripcion', '@(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")', @complemento.Precio)">
+                                <i class="bi bi-plus-circle"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <h5 class="mt-4">Complementos seleccionados:</h5>
+    <table class="table table-bordered" id="tabla-complementos-seleccionados">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Aplica a</th>
+                <th>Precio</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div class="text-end mt-2">
+        <h5>Total complementos: <span id="total-complementos">₡0.00</span></h5>
+    </div>
+
+    <input type="hidden" name="ComplementosSeleccionados" id="complementosJson" />
 
 
     <div class="form-group mb-4">
@@ -237,5 +344,85 @@
         }
 
     </script>
+
+    <script>
+        let huespedesSeleccionados = [];
+
+        function agregarHuesped(id, nombre, correo) {
+            const yaExiste = huespedesSeleccionados.find(h => h.id === id);
+            if (yaExiste) return; // evitar duplicados
+
+            huespedesSeleccionados.push({ id, nombre, correo });
+            actualizarVistaHuespedes();
+        }
+
+        function eliminarHuesped(id) {
+            huespedesSeleccionados = huespedesSeleccionados.filter(h => h.id !== id);
+            actualizarVistaHuespedes();
+        }
+
+        function actualizarVistaHuespedes() {
+            const tabla = document.querySelector('#tabla-huespedes-seleccionados tbody');
+            tabla.innerHTML = '';
+
+            huespedesSeleccionados.forEach(h => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${h.nombre}</td>
+                    <td>${h.correo}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHuesped('${h.id}')">Eliminar</button>
+                    </td>
+                `;
+                tabla.appendChild(fila);
+            });
+
+            document.getElementById('huespedesJson').value = JSON.stringify(huespedesSeleccionados);
+        }
+    </script>
+
+    <script>
+        let complementosSeleccionados = [];
+
+        function agregarComplemento(nombre, descripcion, aplicaA, precio) {
+            const yaExiste = complementosSeleccionados.find(c => c.nombre === nombre);
+            if (yaExiste) return;
+
+            complementosSeleccionados.push({ nombre, descripcion, aplicaA, precio });
+            actualizarVistaComplementos();
+        }
+
+        function eliminarComplemento(nombre) {
+            complementosSeleccionados = complementosSeleccionados.filter(c => c.nombre !== nombre);
+            actualizarVistaComplementos();
+        }
+
+        function actualizarVistaComplementos() {
+            const tabla = document.querySelector('#tabla-complementos-seleccionados tbody');
+            tabla.innerHTML = '';
+
+            let total = 0;
+
+            complementosSeleccionados.forEach(c => {
+                total += c.precio;
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${c.nombre}</td>
+                    <td>${c.descripcion}</td>
+                    <td>${c.aplicaA}</td>
+                    <td>₡${c.precio.toLocaleString('es-CR', { minimumFractionDigits: 2 })}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarComplemento('${c.nombre}')">Eliminar</button>
+                    </td>
+                `;
+                tabla.appendChild(fila);
+            });
+
+            document.getElementById('total-complementos').textContent = `₡${total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('complementosJson').value = JSON.stringify(complementosSeleccionados);
+        }
+    </script>
+
+
 }
 
