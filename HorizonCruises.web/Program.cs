@@ -37,6 +37,8 @@ builder.Services.AddTransient<IRepositoryBarcoHabitaciones, RepositoryBarcoHabit
 builder.Services.AddTransient<IRepositoryItinerario, RepositoryItinerario>();
 builder.Services.AddTransient<IRepositoryFechaCrucero, RepositoryFechaCrucero>();
 builder.Services.AddTransient<IRepositoryPrecioHabitacion, RepositoryPrecioHabitacion>();
+builder.Services.AddTransient<IRepositoryUsuarioHuesped, RepositoryUsuarioHuesped>();
+builder.Services.AddTransient<IRepositoryHuesped, RepostoryHuesped>();
 //Services 
 builder.Services.AddTransient<IServiceBarco, ServiceBarco>();
 builder.Services.AddTransient<IServiceCrucero, ServiceCrucero>();
@@ -49,6 +51,8 @@ builder.Services.AddTransient<IServiceBarcoHabitaciones, ServiceBarcoHabitacione
 builder.Services.AddTransient<IServiseItinerario, ServiceItinerario>();
 builder.Services.AddTransient<IServiceFechaCrucero, ServiceFechaCrucero>();
 builder.Services.AddTransient<IServicePrecioHabitacion, ServicePrecioHabitacion>();
+builder.Services.AddTransient<IServiceUsuarioHuesped, ServiceUsuarioHuesped>();
+builder.Services.AddTransient<IServiceHuesped, ServiceHuesped>();  
 
 //Seguridad
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -82,6 +86,7 @@ builder.Services.AddAutoMapper(config =>
     config.AddProfile<RolProfile>();
     config.AddProfile<TarjetaProfile>();
     config.AddProfile<TelefonoProfile>();
+    config.AddProfile<UsuarioHuespedProfile>();
 });
 
 // Configuar Conexión a la Base de Datos SQL 

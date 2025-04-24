@@ -1,0 +1,43 @@
+﻿@model IEnumerable<HorizonCruises.Application.DTOs.UsuarioHuespedDTO>
+
+@{
+    ViewData["Title"] = "Compañeros de Viaje";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Compañeros de viaje</h2>
+        <a asp-action="Crear" class="btn btn-primary">Nuevo compañero</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover table-striped align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Correo</th>
+                    <th>Fecha de Nacimiento</th>
+                    <th>Pasaporte</th>
+                    <th>Género</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.IdHuespedNavigation.Nombre</td>
+                        <td>@item.IdHuespedNavigation.Apellido</td>
+                        <td>@item.IdHuespedNavigation.Correo</td>
+                        <td>@item.IdHuespedNavigation.FechaNacimiento.ToString("dd/MM/yyyy")</td>
+                        <td>@item.IdHuespedNavigation.Pasaporte</td>
+                        <td>
+                            @(item.IdHuespedNavigation?.Genero == true ? "Masculino" : "Femenino")
+                        </td>
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

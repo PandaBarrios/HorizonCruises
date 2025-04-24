@@ -35,6 +35,7 @@ namespace HorizonCruises.Application.DTOs
         public virtual List<TarjetaDTO>? Tarjeta { get; set; }
 
         public virtual List<TelefonoDTO>? Telefono { get; set; }
+        public virtual List<UsuarioHuespedDTO>? UsuarioHuesped { get; set; }
 
     }
 

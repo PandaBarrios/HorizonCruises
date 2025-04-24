@@ -20,5 +20,6 @@ namespace HorizonCruises.Application.DTOs
         public bool Genero { get; set; }
 
         public virtual List<ReservaDTO> Reserva { get; set; } = null!;
+        public virtual List<UsuarioHuespedDTO> UsuarioHuesped { get; set; } = null!;
     }
 }

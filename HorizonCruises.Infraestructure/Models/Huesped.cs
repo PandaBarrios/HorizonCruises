@@ -19,5 +19,7 @@ public partial class Huesped
 
     public bool? Genero { get; set; }
 
+    public virtual ICollection<UsuarioHuesped> UsuarioHuesped { get; set; } = new List<UsuarioHuesped>();
+
     public virtual ICollection<Reserva> IdReserva { get; set; } = new List<Reserva>();
 }
