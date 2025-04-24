@@ -26,6 +26,4 @@ public partial class Usuario
     public virtual ICollection<Tarjeta> Tarjeta { get; set; } = new List<Tarjeta>();
 
     public virtual ICollection<Telefono> Telefono { get; set; } = new List<Telefono>();
-
-    public virtual ICollection<UsuarioHuesped> UsuarioHuesped { get; set; } = new List<UsuarioHuesped>();
 }

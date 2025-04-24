@@ -15,15 +15,18 @@ namespace HorizonCruises.Application.DTOs
 
         public string Nombre { get; set; } = null!;
 
+        [Display(Name = "Correo electrónico")]
+        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
         public string CorreoElectronico { get; set; } = null!;
 
-        [Display(Name = "Fecha de Nacimiento")]
+        [Display(Name = "Fecha de nacimiento")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateOnly FechaNacimiento { get; set; }
 
         public string Pais { get; set; } = null!;
 
         [Display(Name = "Contraseña")]
+        [DataType(DataType.Password)]
         public string Contrasena { get; set; } = null!;
 
         public int IdRol { get; set; }

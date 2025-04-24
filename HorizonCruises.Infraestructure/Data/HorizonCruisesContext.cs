@@ -52,8 +52,6 @@ public partial class HorizonCruisesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.UseCollation("Latin1_General_CI_AI");
-
         modelBuilder.Entity<Barco>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Barco__3213E83F0231B40D");
@@ -428,17 +426,19 @@ public partial class HorizonCruisesContext : DbContext
 
         modelBuilder.Entity<UsuarioHuesped>(entity =>
         {
-            entity.ToTable("Usuario_Huesped");
+            entity
+                .HasNoKey()
+                .ToTable("Usuario_Huesped");
 
             entity.Property(e => e.IdHuesped).HasColumnName("id_huesped");
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
 
-            entity.HasOne(d => d.IdHuespedNavigation).WithMany(p => p.UsuarioHuesped)
+            entity.HasOne(d => d.IdHuespedNavigation).WithMany()
                 .HasForeignKey(d => d.IdHuesped)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Huesped_Huesped");
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.UsuarioHuesped)
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Huesped_Usuario");
