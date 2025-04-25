@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace HorizonCruises.Infraestructure.Repository.Interfaces
 {
-    public interface IRepositoryComplemento
+    public interface IRepositoryReservaComplementos
     {
-        Task<ICollection<Complemento>> ListAsync();
-        Task<Complemento> FindByIdAsync(int id);
+        Task<ReservaComplemento> CreateAsync(ReservaComplemento objeto);
     }
 }

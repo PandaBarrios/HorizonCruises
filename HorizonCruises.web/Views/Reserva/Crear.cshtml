@@ -31,19 +31,23 @@
                 <p><i class="bi bi-calendar-heart"></i> <strong>Fecha de Reserva:</strong> @Model.Reserva.FechaReserva.ToShortDateString()</p>
             </div>
         </div>
-    </div>
-    <div class="card shadow-sm mt-3">
-        <div class="card-body">
-            <h5 class="card-title">Resumen de Costos</h5>
-            <p><strong>Total General:</strong> <span id="total-general">₡0.00</span></p>
-            <p><strong>IVA (13%):</strong> <span id="iva">₡0.00</span></p>
-            <p><strong>Total con IVA:</strong> <span id="total-con-iva">₡0.00</span></p>
+        <div class="card shadow-sm mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Resumen de Costos</h5>
+                <p><strong>Total General:</strong> <span id="total-general">₡0.00</span></p>
+                <p><strong>IVA (13%):</strong> <span id="iva">₡0.00</span></p>
+                <p><strong>Total con IVA:</strong> <span id="total-con-iva">₡0.00</span></p>
+            </div>
         </div>
     </div>
-
 </div>
 
 <form asp-action="Crear" method="post">
+    <input type="hidden" name="reserva.IdCrucero" value="@Model.Reserva.IdCrucero" />
+    <input type="hidden" name="reserva.IdUsuario" value="@Model.Reserva.IdUsuario" />
+    <input type="hidden" name="reserva.FechaReserva" value="@Model.Reserva.FechaReserva" />
+    <input type="hidden" id="totalInput" name="reserva.Total" />
+
     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
     <h4 class="mb-3">Selecciona las habitaciones</h4>
@@ -77,9 +81,10 @@
                         <td>@habitacion.TotalHabitacionesDisponibles</td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-success"
-                                    onclick="abrirModal('@habitacion.IdHabitacionNavigation.Id', @habitacion.TotalHabitacionesDisponibles)">
+                                    onclick="abrirModal('@habitacion.IdHabitacionNavigation.Id', @habitacion.TotalHabitacionesDisponibles, false, @habitacion.IdHabitacionNavigation.CantidadMaximaHuespedes)">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
+
                         </td>
                     </tr>
                 }
@@ -102,6 +107,12 @@
                         <input type="number" class="form-control" id="cantidad" min="1" />
                         <div class="form-text text-danger d-none" id="error-cantidad">No puedes seleccionar más de las disponibles.</div>
                     </div>
+                    <div class="mb-3">
+                        <label for="pasajerosPorHabitacion" class="form-label">Cantidad de pasajeros en la habitación</label>
+                        <input type="number" class="form-control" id="pasajerosPorHabitacion" min="1" />
+                        <div class="form-text text-danger d-none" id="error-pasajeros">Debe ser al menos 1 y no mayor a la capacidad máxima.</div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -119,6 +130,7 @@
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Cantidad</th>
+                <th>Pasajeros</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
@@ -129,8 +141,6 @@
        @*  <h5>Total habitaciones: <span id="contador-habitaciones">0</span></h5> *@
         <h5>Total: <span id="total-habitaciones">₡0.00</span></h5>
     </div>
-
-
     <input type="hidden" name="HabitacionesSeleccionadas" id="habitacionesJson" />
 
     <!-- Huespedes -->
@@ -161,7 +171,12 @@
                         </td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-success"
-                                    onclick="agregarHuesped('@huesped.IdHuesped', '@huesped.IdHuespedNavigation.Nombre @huesped.IdHuespedNavigation.Apellido', '@huesped.IdHuespedNavigation.Correo')">
+                                    onclick="agregarHuesped('@huesped.IdHuesped','@huesped.IdHuespedNavigation.Nombre'
+                                                           , '@huesped.IdHuespedNavigation.Apellido'
+                                                           , '@huesped.IdHuespedNavigation.FechaNacimiento'
+                                                           , '@huesped.IdHuespedNavigation.Correo'
+                                                           , '@huesped.IdHuespedNavigation.Pasaporte'
+                                                           , '@huesped.IdHuespedNavigation.Genero')">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
                         </td>
@@ -211,7 +226,7 @@
                         </td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-success"
-                                    onclick="agregarComplemento('@complemento.Nombre', '@complemento.Descripcion', '@(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")', @complemento.Precio)">
+                                    onclick="agregarComplemento(@complemento.Id, '@complemento.Nombre', '@complemento.Descripcion', '@(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")', @complemento.Precio)">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
                         </td>
@@ -247,9 +262,62 @@
 
 
     <div class="form-group mb-4">
-        <input type="submit" value="Confirmar Reserva" class="btn btn-primary btn-lg" />
-        <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+        <button type="button" class="btn btn-primary btn-lg" onclick="abrirModalPago()">Confirmar Reserva</button>
     </div>
+
+    <!-- Confirmacion de pago -->
+    <!-- Modal de pago -->
+    <div class="modal fade" id="modalPago" tabindex="-1" aria-labelledby="modalPagoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalPagoLabel">Confirmación de Pago</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Método de pago:</label>
+                        <select class="form-select" id="metodoPago">
+                            <option value="existente">Usar tarjeta existente</option>
+                            <option value="nueva">Ingresar nueva tarjeta</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="nuevaTarjetaContainer" style="display: none;">
+                        <label class="form-label">Datos de la nueva tarjeta</label>
+                        <input type="text" class="form-control mb-2" placeholder="Número de tarjeta">
+                        <input type="text" class="form-control mb-2" placeholder="Nombre en la tarjeta">
+                        <input type="text" class="form-control mb-2" placeholder="Vencimiento (MM/AA)">
+                        <input type="text" class="form-control mb-2" placeholder="CVV">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">¿Deseás pagar ahora?</label>
+                        <select class="form-select" id="montoPago">
+                            <option value="todo">Pagar el monto total</option>
+                            <option value="parcial">Pagar solo una parte</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="inputPagoParcial" style="display: none;">
+                        <label class="form-label">Selecciona cuánto querés pagar:</label>
+                        <input type="range" class="form-range" id="montoParcialSlider" step="1" />
+                        <div class="d-flex justify-content-between small">
+                            <span id="pagoMinimo">₡0.00</span>
+                            <span id="pagoMaximo">₡0.00</span>
+                        </div>
+                        <p class="mt-2">Monto seleccionado: <strong id="pagoSeleccionado">₡0.00</strong></p>
+                        <div class="form-text text-danger d-none" id="errorPagoParcial">El monto debe estar entre 25% y 100% del total con IVA.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success">Confirmar y Pagar</button>
+                    <input type="hidden" name="montoPagado" id="montoPagadoInput" />
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </form>
 
 @section Scripts {
@@ -266,52 +334,84 @@
         }
         };
 
-        function abrirModal(idHabitacion, disponibles, editar = false) {
+        const capacidadMaximaPorHabitacion = {
+        @foreach (var h in Model.Habitaciones)
+        {
+            <text>"@h.IdHabitacionNavigation.Id": @h.IdHabitacionNavigation.CantidadMaximaHuespedes,</text>
+        }
+        };
+
+
+        function abrirModal(idHabitacion, disponibles, editar = false, capacidadMaxima) {
             document.getElementById('habitacion-id').value = idHabitacion;
             const cantidadInput = document.getElementById('cantidad');
+            const pasajerosInput = document.getElementById('pasajerosPorHabitacion');
+
             const existente = habitacionesSeleccionadas.find(h => h.id === idHabitacion);
 
             cantidadInput.value = editar && existente ? existente.cantidad : 1;
             cantidadInput.max = disponibles;
+
+            pasajerosInput.value = editar && existente ? existente.pasajeros : 1;
+            pasajerosInput.max = capacidadMaxima;
+
             cantidadInput.setAttribute("data-editando", editar);
 
             document.getElementById('error-cantidad').classList.add('d-none');
+            document.getElementById('error-pasajeros').classList.add('d-none');
             new bootstrap.Modal(document.getElementById('modalCantidad')).show();
-            actualizarVistaComplementos();
-            actualizarResumenFinal();
+             actualizarResumenFinal();
         }
 
-        function confirmarAgregar() {
+
+         function confirmarAgregar() {
             const id = document.getElementById('habitacion-id').value;
             const cantidad = parseInt(document.getElementById('cantidad').value);
-            const max = parseInt(document.getElementById('cantidad').max);
+            const pasajeros = parseInt(document.getElementById('pasajerosPorHabitacion').value);
+            const maxCantidad = parseInt(document.getElementById('cantidad').max);
+            const maxPasajeros = parseInt(document.getElementById('pasajerosPorHabitacion').max);
+
             const editando = document.getElementById('cantidad').getAttribute("data-editando") === "true";
             const nombre = document.querySelector(`button[onclick*="abrirModal('${id}'"]`)
                            ?.closest("tr")?.children[0]?.textContent?.trim() ?? "Desconocido";
 
-            if (cantidad > max || cantidad < 1) {
+            let error = false;
+
+            if (cantidad > maxCantidad || cantidad < 1) {
                 document.getElementById('error-cantidad').classList.remove('d-none');
-                return;
+                error = true;
             }
+
+            if (pasajeros < 1 || pasajeros > maxPasajeros) {
+                document.getElementById('error-pasajeros').classList.remove('d-none');
+                error = true;
+            }
+
+            if (error) return;
 
             if (editando) {
                 const index = habitacionesSeleccionadas.findIndex(h => h.id === id);
-                if (index >= 0) habitacionesSeleccionadas[index].cantidad = cantidad;
+                if (index >= 0) {
+                    habitacionesSeleccionadas[index].cantidad = cantidad;
+                    habitacionesSeleccionadas[index].pasajeros = pasajeros;
+                }
             } else {
                 const yaExiste = habitacionesSeleccionadas.find(h => h.id === id);
                 if (yaExiste) {
-                     yaExiste.cantidad += cantidad;
+                    yaExiste.cantidad += cantidad;
+                    yaExiste.pasajeros = pasajeros;
                 } else {
                     const fila = document.querySelector(`button[onclick*="abrirModal('${id}'"]`)?.closest("tr");
-                    const precioTexto = fila?.children[5]?.textContent?.replace(/[₡]/g,'').trim() ?? "0";
+                    const precioTexto = fila?.children[5]?.textContent
+                        ?.replace(/[₡]/g, '')
+                        .replace(/\s/g, '')
+                        .replace(',', '.')
+                        .trim() ?? "0";
+
                     const precioUnitario = parseFloat(precioTexto) || 0;
 
-
-                    console.log(`Habitación ID: ${id}, Precio leído: ${precioTexto}`);
-
-                    habitacionesSeleccionadas.push({ id, nombre, cantidad, precioUnitario });
-                }       
-
+                    habitacionesSeleccionadas.push({ id, nombre, cantidad, pasajeros, precioUnitario });
+                }
             }
 
             actualizarVistaSeleccionadas();
@@ -319,6 +419,8 @@
             actualizarVistaComplementos();
             actualizarResumenFinal();
         }
+
+
 
         function actualizarVistaSeleccionadas() {
             const tabla = document.querySelector('#tabla-seleccionadas tbody');
@@ -330,6 +432,7 @@
                     <td>${h.id}</td>
                     <td>${h.nombre}</td>
                     <td>${h.cantidad}</td>
+                    <td>${h.pasajeros}</td>
                     <td class="text-center">
                         <button type="button" class="btn btn-sm btn-primary me-1" onclick="editarHabitacion('${h.id}')">Editar</button>
                         <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHabitacion('${h.id}')">Eliminar</button>
@@ -356,10 +459,12 @@
 
         function editarHabitacion(id) {
             const disponibles = disponibilidadPorHabitacion[id] || 10;
-            abrirModal(id, disponibles, true);
+            const capacidadMaxima = capacidadMaximaPorHabitacion[id] || 10;
+            abrirModal(id, disponibles, true, capacidadMaxima);
             actualizarVistaComplementos();
             actualizarResumenFinal();
         }
+
 
         function actualizarTotal() {
             let total = 0;
@@ -385,14 +490,24 @@
     <script>
         let huespedesSeleccionados = [];
 
-        function agregarHuesped(id, nombre, correo) {
-          const yaExiste = huespedesSeleccionados.find(h => h.id === id);
-            if (yaExiste) return; // evitar duplicados
+                function agregarHuesped(id, nombre, apellido, fechaNacimiento, correo, pasaporte, genero) {
+            const yaExiste = huespedesSeleccionados.find(h => h.id === id);
+            if (yaExiste) return;
 
-            huespedesSeleccionados.push({ id, nombre, correo });
+            huespedesSeleccionados.push({
+                id: parseInt(id),
+                nombre,
+                apellido,
+                fechaNacimiento,
+                correo,
+                pasaporte,
+                genero: genero === "True" || genero === true 
+            });
+
             actualizarVistaHuespedes();
             actualizarResumenFinal();
         }
+
 
         function eliminarHuesped(id) {
             huespedesSeleccionados = huespedesSeleccionados.filter(h => h.id !== id);
@@ -408,7 +523,7 @@
             huespedesSeleccionados.forEach(h => {
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td>${h.nombre}</td>
+                    <td>${h.nombre} ${h.apellido}</td>
                     <td>${h.correo}</td>
                     <td class="text-center">
                         <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHuesped('${h.id}')">Eliminar</button>
@@ -434,14 +549,23 @@
     <script>
         let complementosSeleccionados = [];
 
-        function agregarComplemento(nombre, descripcion, aplicaA, precio) {
-            const yaExiste = complementosSeleccionados.find(c => c.nombre === nombre);
+        function agregarComplemento(id, nombre, descripcion, aplicaA, precio) {
+         const yaExiste = complementosSeleccionados.find(c => c.idComplemento === id);
             if (yaExiste) return;
 
-            complementosSeleccionados.push({ nombre, descripcion, aplicaA, precio });
+        complementosSeleccionados.push({
+            id: id,
+            nombre,
+            descripcion,
+            aplicadoA: aplicaA,
+            precio
+        });
+
+
             actualizarVistaComplementos();
             actualizarResumenFinal();
         }
+
 
         function eliminarComplemento(nombre) {
             complementosSeleccionados = complementosSeleccionados.filter(c => c.nombre !== nombre);
@@ -524,6 +648,84 @@
             document.getElementById('iva').textContent = `₡${iva.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             document.getElementById('total-con-iva').textContent = `₡${totalConIva.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
         }
+
+    </script>
+
+    <script>
+
+         function abrirModalPago() {
+            const totalTexto = document.getElementById('total-con-iva').textContent
+                .replace(/[₡]/g, '')   // quitar símbolo
+                .replace(/\s/g, '')    // quitar espacios
+                .replace(',', '.')     // cambiar coma decimal
+                .trim();
+
+            const total = parseFloat(totalTexto) || 0;
+            const slider = document.getElementById('montoParcialSlider');
+
+            const pagoMin = total * 0.25;
+            const pagoMax = total;
+
+            slider.min = parseFloat(pagoMin.toFixed(2));
+            slider.max = parseFloat(pagoMax.toFixed(2));
+            slider.value = parseFloat(pagoMax.toFixed(2));
+            slider.step = 0.01;
+
+            document.getElementById('pagoMinimo').textContent = `₡${pagoMin.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('pagoMaximo').textContent = `₡${pagoMax.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('pagoSeleccionado').textContent = `₡${slider.value.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+
+            slider.addEventListener('input', () => {
+                document.getElementById('pagoSeleccionado').textContent = `₡${parseFloat(slider.value).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            });
+
+            document.getElementById('errorPagoParcial').classList.add('d-none');
+            document.getElementById('inputPagoParcial').style.display = 'none';
+            document.getElementById('montoPago').value = 'todo';
+
+            new bootstrap.Modal(document.getElementById('modalPago')).show();
+        }
+
+
+        document.getElementById('montoPago').addEventListener('change', function () {
+            const inputParcial = document.getElementById('inputPagoParcial');
+            inputParcial.style.display = this.value === 'parcial' ? 'block' : 'none';
+        });
+
+               document.querySelector('#modalPago .btn-success').addEventListener('click', function () {
+            const tipoPago = document.getElementById('montoPago').value;
+            const slider = document.getElementById('montoParcialSlider');
+            const monto = parseFloat(slider.value);
+
+            const totalTexto = document.getElementById('total-con-iva').textContent
+                .replace(/[₡]/g, '')   // quitar moneda
+                .replace(/\s/g, '')    // quitar espacios de miles
+                .replace(',', '.')     // coma decimal a punto
+                .trim();
+            const total = parseFloat(totalTexto) || 0;
+
+            const min = total * 0.25;
+            const max = total;
+
+            const error = document.getElementById('errorPagoParcial');
+            if (tipoPago === 'parcial' && (monto < min || monto > max)) {
+                error.classList.remove('d-none');
+                return;
+            }
+
+            error.classList.add('d-none');
+
+            // Seteamos todos los valores que se mandan al back
+            document.getElementById('montoPagadoInput').value = (tipoPago === 'parcial') ? monto : total;
+            document.getElementById('habitacionesJson').value = JSON.stringify(habitacionesSeleccionadas);
+            document.getElementById('huespedesJson').value = JSON.stringify(huespedesSeleccionados);
+            document.getElementById('complementosJson').value = JSON.stringify(complementosSeleccionados);
+            document.getElementById('totalInput').value = totalTexto;
+
+            document.querySelector('form').submit();
+        });
+
+
 
     </script>
 }

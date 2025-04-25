@@ -1,5 +1,4 @@
 ﻿using HorizonCruises.Application.DTOs;
-using HorizonCruises.Infraestructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace HorizonCruises.Application.Services.Interfaces
 {
-    public interface IServiceComplemento
+    public interface IServiceReservaComplementos
     {
-        Task<ICollection<ComplementoDTO>> ListAsync();
-        Task<ComplementoDTO> FindByIdAsync(int id);
+        Task CreateAsync(int idReserva, int idComplemento);
     }
 }

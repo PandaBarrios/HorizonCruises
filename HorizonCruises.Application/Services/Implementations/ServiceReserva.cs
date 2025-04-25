@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Interfaces;
+using HorizonCruises.Infraestructure.Models;
 using HorizonCruises.Infraestructure.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HorizonCruises.Application.Services.Implementations
 {
@@ -21,6 +23,18 @@ namespace HorizonCruises.Application.Services.Implementations
             _repository = repository;
             _mapper = mapper;
         }
+
+        public async Task<ReservaDTO> CreateAsync(ReservaDTO reserva)
+        {
+            var entidad = _mapper.Map<Reserva>(reserva);
+
+            // Guardar en la base de datos
+            var entidadCreada = await _repository.CreateAsync(entidad);
+
+            // Mapear de nuevo a DTO para incluir el ID generado
+            return _mapper.Map<ReservaDTO>(entidadCreada);
+        }
+
 
         public async Task<ReservaDTO> FindByIdAsync(int id)
         {

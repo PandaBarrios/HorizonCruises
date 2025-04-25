@@ -13,6 +13,7 @@ namespace HorizonCruises.Application.Services.Interfaces
         Task<ICollection<BarcoHabitacionesDTO>> ListAsync();
         Task<BarcoHabitacionesDTO> FindByIdAsync(int id);
         Task<ICollection<BarcoHabitacionesDTO>> GetHabitacionesByBarcoAsync(int idBarco);
-
+        Task UpdateAsync(int idBarco, int idHabitacion, int disponibles);
+        Task<BarcoHabitacionesDTO> GetHabitacionPorId(int id);
     }
 }
