@@ -41,5 +41,4 @@ namespace HorizonCruises.Application.DTOs
         public virtual List<UsuarioHuespedDTO>? UsuarioHuesped { get; set; }
 
     }
-
 }

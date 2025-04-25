@@ -1,0 +1,66 @@
+﻿@model HorizonCruises.Application.DTOs.TarjetaDTO
+
+@{
+    ViewData["Title"] = "Registrar Tarjeta";
+}
+
+<div class="container mt-5">
+    <h2 class="text-primary text-center mb-4">Registrar Tarjeta</h2>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Titular" class="form-label"></label>
+                    <input asp-for="Titular" class="form-control" placeholder="Nombre del titular" />
+                    <span asp-validation-for="Titular" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NumeroTarjeta" class="form-label"></label>
+                    <input asp-for="NumeroTarjeta" class="form-control" placeholder="Ej: 1234 5678 9012 3456" />
+                    <span asp-validation-for="NumeroTarjeta" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FechaCaducidad" class="form-label"></label>
+                    <input asp-for="FechaCaducidad" class="form-control" type="date" />
+                    <span asp-validation-for="FechaCaducidad" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Cvv" class="form-label"></label>
+                    <input asp-for="Cvv" class="form-control" placeholder="Ej: 123" />
+                    <span asp-validation-for="Cvv" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Guardar Tarjeta
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

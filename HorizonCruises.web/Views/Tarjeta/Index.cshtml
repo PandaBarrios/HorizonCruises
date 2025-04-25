@@ -1,0 +1,39 @@
+﻿@model List<HorizonCruises.Application.DTOs.TarjetaDTO>
+
+@{
+    ViewData["Title"] = "Tarjetas";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center text-primary">Tarjetas Registradas</h1>
+
+    <div class="text-end mb-3">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Registrar Nueva Tarjeta
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover shadow-sm rounded">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model[0].Titular)</th>
+                    <th>@Html.DisplayNameFor(model => model[0].NumeroTarjeta)</th>
+                    <th>@Html.DisplayNameFor(model => model[0].FechaCaducidad)</th>
+                    <th>@Html.DisplayNameFor(model => model[0].Cvv)</th>
+                </tr>
+            </thead>
+            <tbody class="text-center align-middle">
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Titular)</td>
+                        <td>@Html.DisplayFor(modelItem => item.NumeroTarjeta)</td>
+                        <td>@Html.DisplayFor(modelItem => item.FechaCaducidad)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Cvv)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
