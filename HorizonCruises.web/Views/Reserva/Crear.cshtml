@@ -32,6 +32,15 @@
             </div>
         </div>
     </div>
+    <div class="card shadow-sm mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Resumen de Costos</h5>
+            <p><strong>Total General:</strong> <span id="total-general">₡0.00</span></p>
+            <p><strong>IVA (13%):</strong> <span id="iva">₡0.00</span></p>
+            <p><strong>Total con IVA:</strong> <span id="total-con-iva">₡0.00</span></p>
+        </div>
+    </div>
+
 </div>
 
 <form asp-action="Crear" method="post">
@@ -117,8 +126,10 @@
     </table>
 
     <div class="mt-3 text-end">
+       @*  <h5>Total habitaciones: <span id="contador-habitaciones">0</span></h5> *@
         <h5>Total: <span id="total-habitaciones">₡0.00</span></h5>
     </div>
+
 
     <input type="hidden" name="HabitacionesSeleccionadas" id="habitacionesJson" />
 
@@ -174,7 +185,7 @@
 
     <input type="hidden" name="HuespedesSeleccionados" id="huespedesJson" />
 
-    <!-- Huespedes -->
+    <!-- Complementos -->
     <h4 class="mb-3">Opciones para complementar su estadia</h4>
 
     <div class="table-responsive mb-4">
@@ -225,6 +236,10 @@
     </table>
 
     <div class="text-end mt-2">
+        <h5>Total huéspedes: <span id="contador-huespedes">0</span></h5>
+        <h5>Total habitaciones: <span id="contador-habitaciones">0</span></h5>
+        <h5>Total complementos por huéspedes: <span id="total-complementos-huespedes">₡0.00</span></h5>
+        <h5>Total complementos por habitaciones: <span id="total-complementos-habitaciones">₡0.00</span></h5>
         <h5>Total complementos: <span id="total-complementos">₡0.00</span></h5>
     </div>
 
@@ -262,6 +277,8 @@
 
             document.getElementById('error-cantidad').classList.add('d-none');
             new bootstrap.Modal(document.getElementById('modalCantidad')).show();
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function confirmarAgregar() {
@@ -299,6 +316,8 @@
 
             actualizarVistaSeleccionadas();
             bootstrap.Modal.getInstance(document.getElementById('modalCantidad')).hide();
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function actualizarVistaSeleccionadas() {
@@ -321,17 +340,25 @@
 
             document.getElementById('habitacionesJson').value = JSON.stringify(habitacionesSeleccionadas);
             actualizarTotal();
+            actualizarContador();
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
+
 
 
         function eliminarHabitacion(id) {
             habitacionesSeleccionadas = habitacionesSeleccionadas.filter(h => h.id !== id);
             actualizarVistaSeleccionadas();
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function editarHabitacion(id) {
             const disponibles = disponibilidadPorHabitacion[id] || 10;
             abrirModal(id, disponibles, true);
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function actualizarTotal() {
@@ -341,7 +368,17 @@
             });
 
             document.getElementById('total-habitaciones').textContent = `₡${total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
+
+        function actualizarContador() {
+            const totalHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
+            document.getElementById('contador-habitaciones').textContent = totalHabitaciones;
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
+        }
+
 
     </script>
 
@@ -349,16 +386,19 @@
         let huespedesSeleccionados = [];
 
         function agregarHuesped(id, nombre, correo) {
-            const yaExiste = huespedesSeleccionados.find(h => h.id === id);
+          const yaExiste = huespedesSeleccionados.find(h => h.id === id);
             if (yaExiste) return; // evitar duplicados
 
             huespedesSeleccionados.push({ id, nombre, correo });
             actualizarVistaHuespedes();
+            actualizarResumenFinal();
         }
 
         function eliminarHuesped(id) {
             huespedesSeleccionados = huespedesSeleccionados.filter(h => h.id !== id);
             actualizarVistaHuespedes();
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function actualizarVistaHuespedes() {
@@ -378,7 +418,17 @@
             });
 
             document.getElementById('huespedesJson').value = JSON.stringify(huespedesSeleccionados);
+            actualizarContadorHuespedes();
+            actualizarResumenFinal();
         }
+
+        function actualizarContadorHuespedes() {
+            document.getElementById('contador-huespedes').textContent = huespedesSeleccionados.length;
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
+        }
+
+
     </script>
 
     <script>
@@ -390,21 +440,36 @@
 
             complementosSeleccionados.push({ nombre, descripcion, aplicaA, precio });
             actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function eliminarComplemento(nombre) {
             complementosSeleccionados = complementosSeleccionados.filter(c => c.nombre !== nombre);
             actualizarVistaComplementos();
+            actualizarResumenFinal();
         }
 
         function actualizarVistaComplementos() {
             const tabla = document.querySelector('#tabla-complementos-seleccionados tbody');
             tabla.innerHTML = '';
 
-            let total = 0;
+            let totalHuespedes = 0;
+            let totalHabitaciones = 0;
+
+            const cantidadHuespedes = huespedesSeleccionados.length;
+            const cantidadHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
 
             complementosSeleccionados.forEach(c => {
-                total += c.precio;
+                let subtotal = 0;
+
+                if (c.aplicaA === "Huespedes") {
+                    subtotal = c.precio * cantidadHuespedes;
+                    totalHuespedes += subtotal;
+                } else {
+                    subtotal = c.precio * cantidadHabitaciones;
+                    totalHabitaciones += subtotal;
+                }
+
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${c.nombre}</td>
@@ -418,11 +483,48 @@
                 tabla.appendChild(fila);
             });
 
-            document.getElementById('total-complementos').textContent = `₡${total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            const totalGeneral = totalHuespedes + totalHabitaciones;
+
+            document.getElementById('total-complementos-huespedes').textContent = `₡${totalHuespedes.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('total-complementos-habitaciones').textContent = `₡${totalHabitaciones.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('total-complementos').textContent = `₡${totalGeneral.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             document.getElementById('complementosJson').value = JSON.stringify(complementosSeleccionados);
+
+            actualizarResumenFinal();
         }
+
     </script>
 
+    <script>
+        function actualizarResumenFinal() {
+            // Total habitaciones
+            const totalHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + (h.precioUnitario * h.cantidad), 0);
 
+            // Total complementos
+            const cantidadHuespedes = huespedesSeleccionados.length;
+            const cantidadHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
+
+            let totalComplementos = 0;
+
+            complementosSeleccionados.forEach(c => {
+                if (c.aplicaA === "Huespedes") {
+                    totalComplementos += c.precio * cantidadHuespedes;
+                } else {
+                    totalComplementos += c.precio * cantidadHabitaciones;
+                }
+            });
+
+            // Cálculos
+            const totalGeneral = totalHabitaciones + totalComplementos;
+            const iva = totalGeneral * 0.13;
+            const totalConIva = totalGeneral + iva;
+
+            // Mostrar
+            document.getElementById('total-general').textContent = `₡${totalGeneral.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('iva').textContent = `₡${iva.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('total-con-iva').textContent = `₡${totalConIva.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+        }
+
+    </script>
 }
 
