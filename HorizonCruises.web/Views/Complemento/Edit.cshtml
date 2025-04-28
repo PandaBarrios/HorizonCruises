@@ -1,0 +1,70 @@
+﻿@model HorizonCruises.Application.DTOs.ComplementoDTO
+
+@{
+    ViewData["Title"] = "Editar Complemento";
+}
+
+<h1 class="text-center mb-4">Editar Complemento</h1>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Formulario para Editar Complemento</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post">
+                        <!-- Resumen de validación -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Campo Nombre -->
+                        <div class="form-group">
+                            <label asp-for="Nombre" class="control-label">Nombre del Complemento</label>
+                            <input asp-for="Nombre" class="form-control" placeholder="Ingresa el nombre del complemento" />
+                            <span asp-validation-for="Nombre" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo Descripción -->
+                        <div class="form-group">
+                            <label asp-for="Descripcion" class="control-label">Descripción</label>
+                            <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Ingresa una breve descripción"></textarea>
+                            <span asp-validation-for="Descripcion" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo Precio -->
+                        <div class="form-group">
+                            <label asp-for="Precio" class="control-label">Precio</label>
+                            <input asp-for="Precio" class="form-control" placeholder="Ingresa el precio del complemento" />
+                            <span asp-validation-for="Precio" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo Aplicado A -->
+                        <div class="form-group">
+                            <label asp-for="AplicadoA" class="form-label">Aplicado A</label>
+                            <select class="form-control" asp-for="AplicadoA">
+                                <option value="true">Huésped</option>
+                                <option value="false">Camarote</option>
+                            </select>
+                        </div>
+
+                        <!-- Botón Submit -->
+                        <div class="form-group text-center mt-4">
+                            <input type="submit" value="Guardar Cambios" class="btn btn-success btn-lg" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <a asp-action="Index" class="btn btn-link">Volver a la lista</a>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

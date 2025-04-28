@@ -13,7 +13,9 @@ namespace HorizonCruises.Application.Profiles
     {
         public ComplementoProfile()
         {
-            CreateMap<ComplementoDTO, Complemento>().ReverseMap();
+            CreateMap<ComplementoDTO, Complemento>()
+                .ForMember(dest => dest.ReservaComplemento, opt => opt.Ignore())  // Ignorar la propiedad ReservaComplemento
+                .ReverseMap();
         }
     }
 }

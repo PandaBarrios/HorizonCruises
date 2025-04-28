@@ -207,11 +207,11 @@
                         <td>@complemento.Descripcion</td>
                         <td>@complemento.Precio.ToString("C")</td>
                         <td>
-                            @(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")
+                            @(complemento?.AplicadoA == true? "Huespedes" : "Cuartos")
                         </td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-success"
-                                    onclick="agregarComplemento('@complemento.Nombre', '@complemento.Descripcion', '@(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")', @complemento.Precio)">
+                                    onclick="agregarComplemento('@complemento.Nombre', '@complemento.Descripcion', '@(complemento?.AplicadoA == true? "Huespedes" : "Cuartos")', @complemento.Precio)">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
                         </td>

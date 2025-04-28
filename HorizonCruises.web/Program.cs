@@ -13,12 +13,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Globalization;
 using Rotativa.AspNetCore;
 using HorizonCruises.Application.Config;
+using HorizonCruises.Web.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Mapeo de la clase AppConfig para leer appsettings.json
 builder.Services.Configure<AppConfig>(builder.Configuration);
 
+builder.Services.AddHttpClient<UsuarioController>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

@@ -10,5 +10,8 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
     public interface IRepositoryComplemento
     {
         Task<ICollection<Complemento>> ListAsync();
+        Task<Complemento> FindByIdAsync(int id);
+        Task<int> AddAsync(Complemento entity);
+        Task UpdateAsync(Complemento entity);
     }
 }

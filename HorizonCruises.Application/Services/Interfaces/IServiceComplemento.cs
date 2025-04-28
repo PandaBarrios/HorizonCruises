@@ -10,5 +10,8 @@ namespace HorizonCruises.Application.Services.Interfaces
     public interface IServiceComplemento
     {
         Task<ICollection<ComplementoDTO>> ListAsync();
+        Task<ComplementoDTO> FindByIdAsync(int id);
+        Task<int> AddAsync(ComplementoDTO dto);
+        Task UpdateAsync(int id, ComplementoDTO dto);
     }
 }
