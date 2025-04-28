@@ -8,11 +8,8 @@ using System.Threading.Tasks;
 
 namespace HorizonCruises.Application.Services.Interfaces
 {
-    public interface IServiceReserva
+    public interface IServiceReservaHabitaciones
     {
-        Task<ICollection<ReservaDTO>> ListAsync();
-        Task<ICollection<ReservaDTO>> ListAsyncCliente(int idUsuario);
-        Task<ReservaDTO> FindByIdAsync(int id);
-        Task<ReservaDTO> CreateAsync(ReservaDTO reserva);
+        Task CreateAsync(ReservaHabitacionDTO objeto);
     }
 }

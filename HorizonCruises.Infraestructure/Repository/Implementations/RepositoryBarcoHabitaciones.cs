@@ -48,5 +48,25 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                 .ToListAsync();
         }
 
+        public async Task UpdateAsync(int idBarco, int idHabitacion, int disponibles)
+        {
+            var entity = await _context.BarcoHabitaciones
+                .FirstOrDefaultAsync(bh => bh.IdBarco == idBarco && bh.IdHabitacion == idHabitacion);
+
+            if (entity == null)
+                throw new Exception("Relación Barco-Habitación no encontrada.");
+
+            entity.TotalHabitacionesDisponibles = disponibles;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<BarcoHabitaciones> GetHabitacionPorId(int id)
+        {
+            return await _context.BarcoHabitaciones
+                          .Include(b => b.IdHabitacionNavigation)
+                          .ThenInclude(h => h.PrecioHabitacion)
+                          .FirstOrDefaultAsync(b => b.IdHabitacion == id);
+
+        }
     }
 }

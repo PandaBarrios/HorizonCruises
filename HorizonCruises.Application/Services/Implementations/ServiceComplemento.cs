@@ -26,6 +26,13 @@ namespace HorizonCruises.Application.Services.Implementations
             _logger = logger;
         }
 
+        public async Task<ComplementoDTO> FindByIdAsync(int id)
+        {
+            var @object = await _repository.FindByIdAsync(id);
+            var objectMapped = _mapper.Map<ComplementoDTO>(@object);
+            return objectMapped;
+        }
+
         public async Task<ICollection<ComplementoDTO>> ListAsync()
         {
             var lista = await _repository.ListAsync();
