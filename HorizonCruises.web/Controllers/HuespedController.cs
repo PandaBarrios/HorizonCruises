@@ -64,7 +64,7 @@ namespace HorizonCruises.web.Controllers
                 // Enlazar con el usuario actual
                 await _serviceUsuarioHuesped.AddAsync(idUsuario, huespedCreado.Id);
 
-                return RedirectToAction("HuspedIndex", "Huesped");
+                return RedirectToAction("HuspedIndex");
             }
             catch (Exception ex)
             {

@@ -92,8 +92,7 @@ namespace HorizonCruises.web.Controllers
 
         }
 
-        [Authorize(Roles = "Administrador")]
-        // Acción que genera un archivo PDF basado en una vista Razor
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> GenerarFacturaPDF(int? id)
         {
             // Busca la reserva correspondiente usando su ID

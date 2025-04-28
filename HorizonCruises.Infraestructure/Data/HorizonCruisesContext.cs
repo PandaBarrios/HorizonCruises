@@ -413,23 +413,26 @@ public partial class HorizonCruisesContext : DbContext
 
         modelBuilder.Entity<UsuarioHuesped>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Usuario_Huesped");
+            entity.HasKey(e => e.Id); // <-- cambiar aquí, usar solo Id
+            entity.ToTable("Usuario_Huesped");
 
+            entity.Property(e => e.Id).HasColumnName("Id"); // <-- nuevo
             entity.Property(e => e.IdHuesped).HasColumnName("id_huesped");
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
 
-            entity.HasOne(d => d.IdHuespedNavigation).WithMany()
+            entity.HasOne(d => d.IdHuespedNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.IdHuesped)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Huesped_Huesped");
 
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany()
+            entity.HasOne(d => d.IdUsuarioNavigation)
+                .WithMany()
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Huesped_Usuario");
         });
+
 
         modelBuilder.Entity<ReservaHuesped>(entity =>
         {
