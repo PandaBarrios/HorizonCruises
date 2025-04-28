@@ -5,8 +5,6 @@ namespace HorizonCruises.Infraestructure.Models;
 
 public partial class ReservaHuesped
 {
-    public int Id { get; set; }
-
     public int IdReserva { get; set; }
 
     public int IdHuesped { get; set; }

@@ -51,6 +51,77 @@ namespace HorizonCruises.web.Controllers
             _logger = logger;
         }
 
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> IndexReserva()
+        {
+            var collection = await _serviceReserva.ListAsync();
+            return View(collection);
+
+        }
+
+        [Authorize(Roles = "Cliente")]
+        public async Task<IActionResult> IndexReservaCliente(int idUsuario)
+        {
+            var collection = await _serviceReserva.ListAsyncCliente(idUsuario);
+            return View(collection);
+
+        }
+
+        [Authorize(Roles = "Cliente, Administrador")]
+        public async Task<IActionResult> DetailsReserva(int? id)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    return RedirectToAction("IndexReserva");
+                }
+                var @object = await _serviceReserva.FindByIdAsync(id.Value);
+                if (@object == null)
+                {
+                    throw new Exception("Reserva no existente");
+
+                }
+                return View(@object);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
+        [Authorize(Roles = "Administrador")]
+        // Acción que genera un archivo PDF basado en una vista Razor
+        public async Task<IActionResult> GenerarFacturaPDF(int? id)
+        {
+            // Busca la reserva correspondiente usando su ID
+            var reserva = await _serviceReserva.FindByIdAsync(id.Value);
+
+            // Si no existe la reserva, redirige al listado
+            if (reserva == null)
+            {
+                return RedirectToAction("IndexReserva");
+            }
+
+            // Genera un PDF usando la vista "DetailsReserva" y pasando el objeto reserva como modelo
+            return new ViewAsPdf("DetailsReserva", reserva)
+            {
+                // Nombre del archivo PDF que se descargará
+                FileName = $"FacturaReserva_{id}.pdf",
+
+                // Tamaño del papel: A4 (clásico de impresora)
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+
+                // Orientación de la página: vertical (Portrait)
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait
+            };
+        }
+
+
+
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> Crear(int? id)
         {
             if (!int.TryParse(User.FindFirst("IdUsuario")?.Value, out int idUsuario))
@@ -86,6 +157,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> Crear(ReservaDTO reserva,string HabitacionesSeleccionadas,
                                                                   string HuespedesSeleccionados,
                                                                   string ComplementosSeleccionados,
@@ -115,10 +187,10 @@ namespace HorizonCruises.web.Controllers
                 var huespedes = JsonSerializer.Deserialize<List<HuespedDTO>>(HuespedesSeleccionados);
                 var complementos = JsonSerializer.Deserialize<List<ComplementoSimpleDTO>>(ComplementosSeleccionados);
 
-                reserva.FechaReserva = DateOnly.FromDateTime(DateTime.Now);
                 reserva.IdCruceroNavigation = await _serviceCrucero.FindByIdAsync(reserva.IdCrucero);
                 reserva.Saldopendiente = reserva.Total - (montoPagado ?? 0);
                 reserva.Estado = reserva.Saldopendiente == 0;
+                
 
                 reserva.IdCruceroNavigation = null;
                 reserva.IdUsuarioNavigation = null;
@@ -139,10 +211,10 @@ namespace HorizonCruises.web.Controllers
                         };
 
                         await _serviceReservaHabitacion.CreateAsync(reservaDTO);
-                        await _serviceBarcoHabitaciones.UpdateAsync(
-                            nuevaReserva.IdCruceroNavigation.IdBarco,
-                            idHabitacion,
-                            h.Cantidad);
+                        //await _serviceBarcoHabitaciones.UpdateAsync(
+                        //    nuevaReserva.IdCruceroNavigation.IdBarco,
+                        //    idHabitacion,
+                        //    h.Cantidad);
                     }
                 }
 
@@ -162,33 +234,18 @@ namespace HorizonCruises.web.Controllers
                 {
                     foreach (var c in complementos)
                     {
-                        await _serviceReservaComplementos.CreateAsync(idReserva, c.Id);
+                      await _serviceReservaComplementos.CreateAsync(idReserva, c.Id, c.Cantidad);
                     }
                 }
-                return RedirectToAction("IndexReserva");
+
+                await GenerarFacturaPDF(reserva.Id);
+
+                return RedirectToAction("IndexReservaCliente", new { reserva.IdUsuario });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al guardar la reserva.");
-                ModelState.AddModelError("", "Ocurrió un error al guardar la reserva.");
-
-                reserva.IdCruceroNavigation = await _serviceCrucero.FindByIdAsync(reserva.IdCrucero);
-                var habitacionesDTO = await _serviceBarcoHabitaciones.GetHabitacionesByBarcoAsync(reserva.IdCruceroNavigation.IdBarco);
-                var huespedesDTO = await _serviceUsuarioHuesped.GetHuespedByUsuarioAsync(reserva.IdUsuario);
-                var complementoDTO = await _serviceComplemento.ListAsync();
-
-                var viewModel = new ViewModelReserva
-                {
-                    Reserva = reserva,
-                    Habitaciones = habitacionesDTO.ToList(),
-                    Huespedes = huespedesDTO.ToList(),
-                    Complementos = complementoDTO.ToList(),
-                };
-
-                return View(viewModel);
+                return RedirectToAction("CruceroIndex", "Crucero");
             }
         }
-
-        
     }
 }

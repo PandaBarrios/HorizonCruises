@@ -43,10 +43,6 @@
 </div>
 
 <form asp-action="Crear" method="post">
-    <input type="hidden" name="reserva.IdCrucero" value="@Model.Reserva.IdCrucero" />
-    <input type="hidden" name="reserva.IdUsuario" value="@Model.Reserva.IdUsuario" />
-    <input type="hidden" name="reserva.FechaReserva" value="@Model.Reserva.FechaReserva" />
-    <input type="hidden" id="totalInput" name="reserva.Total" />
 
     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
@@ -81,7 +77,9 @@
                         <td>@habitacion.TotalHabitacionesDisponibles</td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-success"
-                                    onclick="abrirModal('@habitacion.IdHabitacionNavigation.Id', @habitacion.TotalHabitacionesDisponibles, false, @habitacion.IdHabitacionNavigation.CantidadMaximaHuespedes)">
+                                    onclick="abrirModal('@habitacion.IdHabitacionNavigation.Id', 
+                                                         @habitacion.TotalHabitacionesDisponibles, false,
+                                                         @habitacion.IdHabitacionNavigation.CantidadMaximaHuespedes)">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
 
@@ -104,12 +102,12 @@
                     <input type="hidden" id="habitacion-id" />
                     <div class="mb-3">
                         <label for="cantidad" class="form-label">Cantidad de habitaciones</label>
-                        <input type="number" class="form-control" id="cantidad" min="1" />
+                        <input type="number" class="form-control" id="cantidad" min="1" onkeydown="return false";/>
                         <div class="form-text text-danger d-none" id="error-cantidad">No puedes seleccionar más de las disponibles.</div>
                     </div>
                     <div class="mb-3">
                         <label for="pasajerosPorHabitacion" class="form-label">Cantidad de pasajeros en la habitación</label>
-                        <input type="number" class="form-control" id="pasajerosPorHabitacion" min="1" />
+                        <input type="number" class="form-control" id="pasajerosPorHabitacion" min="1" onkeydown="return false;" />
                         <div class="form-text text-danger d-none" id="error-pasajeros">Debe ser al menos 1 y no mayor a la capacidad máxima.</div>
                     </div>
 
@@ -138,12 +136,12 @@
     </table>
 
     <div class="mt-3 text-end">
-       @*  <h5>Total habitaciones: <span id="contador-habitaciones">0</span></h5> *@
+        @*  <h5>Total habitaciones: <span id="contador-habitaciones">0</span></h5> *@
         <h5>Total: <span id="total-habitaciones">₡0.00</span></h5>
     </div>
     <input type="hidden" name="HabitacionesSeleccionadas" id="habitacionesJson" />
 
-    <!-- Huespedes -->
+    <!-- ------------------------------------------------------------------ Huespedes ------------------------------------------------------------------- -->
     <h4 class="mb-3">Selecciona tus acompañantes</h4>
 
     <div class="table-responsive mb-4">
@@ -161,7 +159,7 @@
             <tbody>
                 @foreach (var huesped in Model.Huespedes)
                 {
-                     <tr>
+                    <tr>
                         <td>@huesped.IdHuespedNavigation.Nombre @huesped.IdHuespedNavigation.Apellido </td>
                         <td>@huesped.IdHuespedNavigation.FechaNacimiento</td>
                         <td>@huesped.IdHuespedNavigation.Correo</td>
@@ -177,7 +175,7 @@
                                                            , '@huesped.IdHuespedNavigation.Correo'
                                                            , '@huesped.IdHuespedNavigation.Pasaporte'
                                                            , '@huesped.IdHuespedNavigation.Genero')">
-                                <i class="bi bi-plus-circle"></i> Agregar
+                                     <i class="bi bi-plus-circle"></i> Agregar
                             </button>
                         </td>
                     </tr>
@@ -185,6 +183,12 @@
             </tbody>
         </table>
     </div>
+
+    <div id="alerta-huesped" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
+        <strong>¡Atención!</strong> Este huésped ya ha sido agregado.
+        <button type="button" class="btn-close" onclick="cerrarAlerta()" aria-label="Close"></button>
+    </div>
+
 
     <h5 class="mt-4">Tus acompañantes seleccionados:</h5>
     <table class="table table-bordered" id="tabla-huespedes-seleccionados">
@@ -200,7 +204,7 @@
 
     <input type="hidden" name="HuespedesSeleccionados" id="huespedesJson" />
 
-    <!-- Complementos -->
+    <!-- -------------------------------------------------------------------------- Complementos -------------------------------------------------------- -->
     <h4 class="mb-3">Opciones para complementar su estadia</h4>
 
     <div class="table-responsive mb-4">
@@ -222,13 +226,17 @@
                         <td>@complemento.Descripcion</td>
                         <td>@complemento.Precio.ToString("C")</td>
                         <td>
-                            @(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")
+                            @(complemento?.AplicadoA == true ? "Huespedes" : "Habitacion")
                         </td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-outline-success"
-                                    onclick="agregarComplemento(@complemento.Id, '@complemento.Nombre', '@complemento.Descripcion', '@(complemento?.AplicadoA == true ? "Huespedes" : "Cuartos")', @complemento.Precio)">
+                                    onclick="agregarComplemento(@complemento.Id,
+                                                               '@complemento.Nombre',
+                                                                @complemento.Precio,
+                                                                @(complemento.AplicadoA.ToString().ToLower()))">
                                 <i class="bi bi-plus-circle"></i> Agregar
                             </button>
+
                         </td>
                     </tr>
                 }
@@ -236,19 +244,64 @@
         </table>
     </div>
 
-    <h5 class="mt-4">Complementos seleccionados:</h5>
-    <table class="table table-bordered" id="tabla-complementos-seleccionados">
-        <thead>
+    <!-- Modal para seleccionar cantidad de complemento -->
+    <div class="modal fade" id="modalCantidadComplemento" tabindex="-1" aria-labelledby="modalCantidadComplementoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCantidadComplementoLabel">Cantidad de Complemento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="complemento-id" />
+                    <input type="hidden" id="complemento-nombre" />
+                    <input type="hidden" id="complemento-precio" />
+
+                    <div class="mb-3">
+                        <label for="cantidadComplemento" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="cantidadComplemento" min="1" />
+                        <div class="form-text text-danger d-none" id="error-cantidadComplemento">
+                            No puedes seleccionar más que el máximo permitido.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmarAgregarComplemento()">Agregar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="alerta-complemento" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
+        <strong>¡Atención!</strong> <span>Este complemento ya ha sido agregado.</span>
+        <button type="button" class="btn-close" onclick="cerrarAlertaComplemento()" aria-label="Close"></button>
+    </div>
+
+    <!-- Tabla Complementos Seleccionados -->
+    <h5 class="mt-4">Tus complementos seleccionadas:</h5>
+    <table class="table table-bordered table-hover align-middle" id="tabla-complementos-seleccionados">
+        <thead class="table-light">
             <tr>
                 <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Aplica a</th>
                 <th>Precio</th>
+                <th>Aplica a:</th>
+                <th>Cantidad</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+            <!-- Complementos agregados dinámicamente -->
+        </tbody>
     </table>
+
+    <!-- Estos inputs ocultos se usan para validar cantidades -->
+    <input type="hidden" id="TotalHuespedes" />
+    <input type="hidden" id="TotalHabitaciones" />
 
     <div class="text-end mt-2">
         <h5>Total huéspedes: <span id="contador-huespedes">0</span></h5>
@@ -259,7 +312,6 @@
     </div>
 
     <input type="hidden" name="ComplementosSeleccionados" id="complementosJson" />
-
 
     <div class="form-group mb-4">
         <button type="button" class="btn btn-primary btn-lg" onclick="abrirModalPago()">Confirmar Reserva</button>
@@ -317,6 +369,12 @@
         </div>
     </div>
 
+    <input type="hidden" name="reserva.IdCrucero" value="@Model.Reserva.IdCrucero" />
+    <input type="hidden" name="reserva.IdUsuario" value="@Model.Reserva.IdUsuario" />
+    <input type="hidden" name="reserva.FechaReserva" value="@Model.Reserva.FechaReserva" />
+    <input type="hidden" id="totalInput" name="reserva.Total" />
+    <input type="hidden" id="subTotalInput" name="reserva.SubTotal" />
+    <input type="hidden" id="ivaInput" name="reserva.Iva" />
 
 </form>
 
@@ -360,11 +418,11 @@
             document.getElementById('error-cantidad').classList.add('d-none');
             document.getElementById('error-pasajeros').classList.add('d-none');
             new bootstrap.Modal(document.getElementById('modalCantidad')).show();
-             actualizarResumenFinal();
+             
         }
 
 
-         function confirmarAgregar() {
+        function confirmarAgregar() {
             const id = document.getElementById('habitacion-id').value;
             const cantidad = parseInt(document.getElementById('cantidad').value);
             const pasajeros = parseInt(document.getElementById('pasajerosPorHabitacion').value);
@@ -377,17 +435,28 @@
 
             let error = false;
 
+            // Validaciones básicas
             if (cantidad > maxCantidad || cantidad < 1) {
                 document.getElementById('error-cantidad').classList.remove('d-none');
                 error = true;
             }
-
             if (pasajeros < 1 || pasajeros > maxPasajeros) {
                 document.getElementById('error-pasajeros').classList.remove('d-none');
                 error = true;
             }
-
             if (error) return;
+
+            // Verificar disponibilidad antes de agregar
+            const yaAgregadas = habitacionesSeleccionadas
+                .filter(h => h.id === id)
+                .reduce((total, h) => total + h.cantidad, 0);
+
+            const disponibles = disponibilidadPorHabitacion[id] ?? 0;
+            if ((yaAgregadas + cantidad) > disponibles) {
+                document.getElementById('error-cantidad').textContent = 'Ya no hay habitaciones disponibles para agregar.';
+                document.getElementById('error-cantidad').classList.remove('d-none');
+                return;
+            }
 
             if (editando) {
                 const index = habitacionesSeleccionadas.findIndex(h => h.id === id);
@@ -417,10 +486,10 @@
             actualizarVistaSeleccionadas();
             bootstrap.Modal.getInstance(document.getElementById('modalCantidad')).hide();
             actualizarVistaComplementos();
+
             actualizarResumenFinal();
+            
         }
-
-
 
         function actualizarVistaSeleccionadas() {
             const tabla = document.querySelector('#tabla-seleccionadas tbody');
@@ -434,36 +503,42 @@
                     <td>${h.cantidad}</td>
                     <td>${h.pasajeros}</td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-primary me-1" onclick="editarHabitacion('${h.id}')">Editar</button>
                         <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHabitacion('${h.id}')">Eliminar</button>
                     </td>
                 `;
                 tabla.appendChild(fila);
             });
 
+            document.getElementById('TotalHabitaciones').value = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
             document.getElementById('habitacionesJson').value = JSON.stringify(habitacionesSeleccionadas);
             actualizarTotal();
             actualizarContador();
             actualizarVistaComplementos();
             actualizarResumenFinal();
+           
         }
 
 
 
         function eliminarHabitacion(id) {
             habitacionesSeleccionadas = habitacionesSeleccionadas.filter(h => h.id !== id);
+
+            huespedesSeleccionados = [];
+
             actualizarVistaSeleccionadas();
+            actualizarVistaHuespedes(); // actualizar la tabla de huéspedes
             actualizarVistaComplementos();
             actualizarResumenFinal();
         }
 
-        function editarHabitacion(id) {
-            const disponibles = disponibilidadPorHabitacion[id] || 10;
-            const capacidadMaxima = capacidadMaximaPorHabitacion[id] || 10;
-            abrirModal(id, disponibles, true, capacidadMaxima);
-            actualizarVistaComplementos();
-            actualizarResumenFinal();
-        }
+
+        // function editarHabitacion(id) {
+        //     const disponibles = disponibilidadPorHabitacion[id] || 10;
+        //     const capacidadMaxima = capacidadMaximaPorHabitacion[id] || 10;
+        //     abrirModal(id, disponibles, true, capacidadMaxima);
+        //     actualizarVistaComplementos();
+        //     actualizarResumenFinal();
+        // }
 
 
         function actualizarTotal() {
@@ -474,14 +549,12 @@
 
             document.getElementById('total-habitaciones').textContent = `₡${total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             actualizarVistaComplementos();
-            actualizarResumenFinal();
         }
 
         function actualizarContador() {
             const totalHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
             document.getElementById('contador-habitaciones').textContent = totalHabitaciones;
             actualizarVistaComplementos();
-            actualizarResumenFinal();
         }
 
 
@@ -490,31 +563,39 @@
     <script>
         let huespedesSeleccionados = [];
 
-                function agregarHuesped(id, nombre, apellido, fechaNacimiento, correo, pasaporte, genero) {
-            const yaExiste = huespedesSeleccionados.find(h => h.id === id);
-            if (yaExiste) return;
+        function agregarHuesped(id, nombre, apellido, correo) {
+            id = Number(id); // Asegurarnos que id sea numérico
 
-            huespedesSeleccionados.push({
-                id: parseInt(id),
-                nombre,
-                apellido,
-                fechaNacimiento,
-                correo,
-                pasaporte,
-                genero: genero === "True" || genero === true 
+            // Validar que haya habitaciones seleccionadas
+            if (habitacionesSeleccionadas.length === 0) {
+                mostrarAlerta('Debe seleccionar al menos una habitación antes de agregar acompañantes.');
+                return;
+            }
+
+            // Validar el máximo de huéspedes permitido
+            let capacidadTotal = 0;
+            habitacionesSeleccionadas.forEach(h => {
+                capacidadTotal += (h.pasajeros * h.cantidad);
             });
 
-            actualizarVistaHuespedes();
-            actualizarResumenFinal();
+            const capacidadDisponible = capacidadTotal; // Se resta 1 por el usuario que reserva 
+
+            if (huespedesSeleccionados.length >= capacidadDisponible) {
+                mostrarAlerta(`Ya ha agregado el máximo de acompañantes permitidos (${capacidadDisponible}).`);
+                return;
+            }
+
+            // Validar si ya existe el huésped antes de agregar
+            const yaExiste = huespedesSeleccionados.some(h => h.id === id);
+            if (yaExiste) {
+                mostrarAlerta('Este huésped ya ha sido agregado.');
+                return;
+            }
+
+            huespedesSeleccionados.push({ id, nombre, apellido, correo });
+            actualizarVistaHuespedes();   
         }
 
-
-        function eliminarHuesped(id) {
-            huespedesSeleccionados = huespedesSeleccionados.filter(h => h.id !== id);
-            actualizarVistaHuespedes();
-            actualizarVistaComplementos();
-            actualizarResumenFinal();
-        }
 
         function actualizarVistaHuespedes() {
             const tabla = document.querySelector('#tabla-huespedes-seleccionados tbody');
@@ -526,50 +607,115 @@
                     <td>${h.nombre} ${h.apellido}</td>
                     <td>${h.correo}</td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHuesped('${h.id}')">Eliminar</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarHuesped(${h.id})">Eliminar</button>
                     </td>
                 `;
                 tabla.appendChild(fila);
             });
-
-            document.getElementById('huespedesJson').value = JSON.stringify(huespedesSeleccionados);
-            actualizarContadorHuespedes();
-            actualizarResumenFinal();
+            document.getElementById('TotalHuespedes').value = huespedesSeleccionados.length;
         }
 
-        function actualizarContadorHuespedes() {
-            document.getElementById('contador-huespedes').textContent = huespedesSeleccionados.length;
-            actualizarVistaComplementos();
-            actualizarResumenFinal();
+        function eliminarHuesped(id) {
+            id = Number(id); // Asegurarnos que id sea numérico
+            huespedesSeleccionados = huespedesSeleccionados.filter(h => h.id !== id);
+            actualizarVistaHuespedes();
+
         }
 
+        function mostrarAlerta(mensaje) {
+            const alerta = document.getElementById('alerta-huesped');
+            alerta.querySelector('strong').nextSibling.textContent = " " + mensaje;
+            alerta.classList.remove('d-none');
+            alerta.classList.add('show');
 
+            setTimeout(() => {
+                cerrarAlerta();
+            }, 3500); // Se oculta automáticamente en 3 segundos
+        }
+
+        function cerrarAlerta() {
+            const alerta = document.getElementById('alerta-huesped');
+            alerta.classList.add('d-none');
+        }
     </script>
+
+
+    @* -----------------------------  SECCION DE COMPLEMENTOS  --------------------------------------------------------------------------------------------*@
 
     <script>
         let complementosSeleccionados = [];
+        let complementoTemporal = {}; // Para guardar mientras se confirma
 
-        function agregarComplemento(id, nombre, descripcion, aplicaA, precio) {
-         const yaExiste = complementosSeleccionados.find(c => c.idComplemento === id);
-            if (yaExiste) return;
+        function agregarComplemento(id, nombre, precio, aplicaA) {
 
-        complementosSeleccionados.push({
-            id: id,
-            nombre,
-            descripcion,
-            aplicadoA: aplicaA,
-            precio
-        });
+            const totalHuespedes = parseInt(document.getElementById('TotalHuespedes')?.value || '0');
+            const totalHabitaciones = parseInt(document.getElementById('TotalHabitaciones')?.value || '0');
 
+            aplicaA = (aplicaA === true || aplicaA === "true");
 
-            actualizarVistaComplementos();
-            actualizarResumenFinal();
+            // Validar antes de mostrar el modal
+            if (aplicaA === true && totalHuespedes === 0) {
+                mostrarAlertaComplemento('No puedes agregar complementos para huéspedes sin haber agregado huéspedes.');
+                return;
+            }
+            if (aplicaA === false && totalHabitaciones === 0) {
+                mostrarAlertaComplemento('No puedes agregar complementos para habitaciones sin haber agregado habitaciones.');
+                return;
+            }
+
+            complementoTemporal = { id, nombre, precio, aplicaA };
+
+            document.getElementById('complemento-id').value = id;
+            document.getElementById('complemento-nombre').value = nombre;
+            document.getElementById('complemento-precio').value = precio;
+            document.getElementById('cantidadComplemento').value = aplicaA ? totalHuespedes : totalHabitaciones;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalCantidadComplemento'));
+            modal.show();
         }
 
+        function confirmarAgregarComplemento() {
+            const id = Number(document.getElementById('complemento-id').value);
+            const nombre = document.getElementById('complemento-nombre').value;
+            const precio = Number(document.getElementById('complemento-precio').value);
+            const cantidad = Number(document.getElementById('cantidadComplemento').value);
+            const aplicaA = complementoTemporal.aplicaA;
 
-        function eliminarComplemento(nombre) {
-            complementosSeleccionados = complementosSeleccionados.filter(c => c.nombre !== nombre);
+            const totalHuespedes = parseInt(document.getElementById('TotalHuespedes')?.value || '0');
+            const totalHabitaciones = parseInt(document.getElementById('TotalHabitaciones')?.value || '0');
+
+            const maxPermitido = Math.max(totalHuespedes, totalHabitaciones);
+
+
+            console.log(cantidad);
+
+            if (isNaN(cantidad) || cantidad <= 0 || cantidad > maxPermitido) {
+                document.getElementById('error-cantidadComplemento').classList.remove('d-none');
+                return;
+            }
+
+            // Validar si ya existe
+            const existe = complementosSeleccionados.some(c => c.id === id);
+            if (existe) {
+                document.getElementById('alerta-complemento').classList.remove('d-none');
+                return;
+            }
+
+            complementosSeleccionados.push({
+                    id,
+                    nombre,
+                    precio,
+                    aplicaA, 
+                    cantidad
+            });
+
+
             actualizarVistaComplementos();
+
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCantidadComplemento'));
+            modal.hide();
+
             actualizarResumenFinal();
         }
 
@@ -577,83 +723,100 @@
             const tabla = document.querySelector('#tabla-complementos-seleccionados tbody');
             tabla.innerHTML = '';
 
-            let totalHuespedes = 0;
-            let totalHabitaciones = 0;
-
-            const cantidadHuespedes = huespedesSeleccionados.length;
-            const cantidadHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
-
             complementosSeleccionados.forEach(c => {
-                let subtotal = 0;
-
-                if (c.aplicaA === "Huespedes") {
-                    subtotal = c.precio * cantidadHuespedes;
-                    totalHuespedes += subtotal;
-                } else {
-                    subtotal = c.precio * cantidadHabitaciones;
-                    totalHabitaciones += subtotal;
-                }
-
+                console.log(c.aplicaA)
+                console.log(c.aplicado)
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${c.nombre}</td>
-                    <td>${c.descripcion}</td>
-                    <td>${c.aplicaA}</td>
-                    <td>₡${c.precio.toLocaleString('es-CR', { minimumFractionDigits: 2 })}</td>
+                    <td>${'₡' + c.precio}</td>
+                    <td>${c.aplicaA ? 'Huéspedes' : 'Habitaciones'}</td>
+                    <td>${c.cantidad}</td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarComplemento('${c.nombre}')">Eliminar</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="eliminarComplemento(${c.id})">Eliminar</button>
                     </td>
                 `;
                 tabla.appendChild(fila);
             });
-
-            const totalGeneral = totalHuespedes + totalHabitaciones;
-
-            document.getElementById('total-complementos-huespedes').textContent = `₡${totalHuespedes.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
-            document.getElementById('total-complementos-habitaciones').textContent = `₡${totalHabitaciones.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
-            document.getElementById('total-complementos').textContent = `₡${totalGeneral.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
-            document.getElementById('complementosJson').value = JSON.stringify(complementosSeleccionados);
-
             actualizarResumenFinal();
         }
 
+        function eliminarComplemento(id) {
+            complementosSeleccionados = complementosSeleccionados.filter(c => c.id !== id);
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
+        }
+
+        function eliminarComplementosPorTipo(aplicaA) {
+            complementosSeleccionados = complementosSeleccionados.filter(c => c.aplicaA !== aplicaA);
+            actualizarVistaComplementos();
+            actualizarResumenFinal();
+        }
+
+        function cerrarAlertaComplemento() {
+            document.getElementById('alerta-complemento').classList.add('d-none');
+        }
+
+        function mostrarAlertaComplemento(mensaje) {
+            const alerta = document.getElementById('alerta-complemento');
+            alerta.querySelector('strong').textContent = '¡Atención!';
+            alerta.querySelector('span').textContent = mensaje;
+            alerta.classList.remove('d-none');
+        }
+
+        // Funciones que debes llamar al eliminar huéspedes o habitaciones
+        function cuandoSeEliminanTodosLosHuespedes() {
+            eliminarComplementosPorTipo(true); // Eliminar complementos para huéspedes
+             
+        }
+
+        function cuandoSeEliminanTodasLasHabitaciones() {
+            eliminarComplementosPorTipo(false); // Eliminar complementos para habitaciones
+            
+        }
     </script>
+
+    @*----------------------------------------------- Resumen Final ----------------------------------------------------------->*@
 
     <script>
         function actualizarResumenFinal() {
-            // Total habitaciones
+            // Ejemplo de cálculos
             const totalHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + (h.precioUnitario * h.cantidad), 0);
-
-            // Total complementos
             const cantidadHuespedes = huespedesSeleccionados.length;
             const cantidadHabitaciones = habitacionesSeleccionadas.reduce((sum, h) => sum + h.cantidad, 0);
 
             let totalComplementos = 0;
 
             complementosSeleccionados.forEach(c => {
-                if (c.aplicaA === "Huespedes") {
+                if (c.aplicaA === true) {
                     totalComplementos += c.precio * cantidadHuespedes;
                 } else {
                     totalComplementos += c.precio * cantidadHabitaciones;
                 }
             });
 
-            // Cálculos
+            // Totales
             const totalGeneral = totalHabitaciones + totalComplementos;
             const iva = totalGeneral * 0.13;
             const totalConIva = totalGeneral + iva;
 
-            // Mostrar
+            // Mostrar en la pantalla
             document.getElementById('total-general').textContent = `₡${totalGeneral.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             document.getElementById('iva').textContent = `₡${iva.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             document.getElementById('total-con-iva').textContent = `₡${totalConIva.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
-        }
 
+            document.getElementById('totalInput').value = totalConIva.toFixed(2);
+        }
     </script>
 
+
+
+    @* -------------------------------------------------- Pago --------------------------------------------------------------------------*@
+
+    
     <script>
 
-         function abrirModalPago() {
+        function abrirModalPago() {
             const totalTexto = document.getElementById('total-con-iva').textContent
                 .replace(/[₡]/g, '')   // quitar símbolo
                 .replace(/\s/g, '')    // quitar espacios
@@ -692,7 +855,7 @@
             inputParcial.style.display = this.value === 'parcial' ? 'block' : 'none';
         });
 
-               document.querySelector('#modalPago .btn-success').addEventListener('click', function () {
+        document.querySelector('#modalPago .btn-success').addEventListener('click', function () {
             const tipoPago = document.getElementById('montoPago').value;
             const slider = document.getElementById('montoParcialSlider');
             const monto = parseFloat(slider.value);
@@ -703,6 +866,19 @@
                 .replace(',', '.')     // coma decimal a punto
                 .trim();
             const total = parseFloat(totalTexto) || 0;
+
+            const subTotalTexto = document.getElementById('total-general').textContent
+                .replace(/[₡]/g, '')   // quitar moneda
+                .replace(/\s/g, '')    // quitar espacios de miles
+                .replace(',', '.')     // coma decimal a punto
+                .trim();
+
+           const ivaTexto = document.getElementById('iva').textContent
+                .replace(/[₡]/g, '')   // quitar moneda
+                .replace(/\s/g, '')    // quitar espacios de miles
+                .replace(',', '.')     // coma decimal a punto
+                .trim();
+         
 
             const min = total * 0.25;
             const max = total;
@@ -721,11 +897,11 @@
             document.getElementById('huespedesJson').value = JSON.stringify(huespedesSeleccionados);
             document.getElementById('complementosJson').value = JSON.stringify(complementosSeleccionados);
             document.getElementById('totalInput').value = totalTexto;
+            document.getElementById('subTotalInput').value = subTotalTexto;
+            document.getElementById('ivaInput').value = ivaTexto;
 
             document.querySelector('form').submit();
         });
-
-
 
     </script>
 }

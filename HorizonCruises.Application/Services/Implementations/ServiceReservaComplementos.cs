@@ -22,16 +22,17 @@ namespace HorizonCruises.Application.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task CreateAsync(int idReserva, int idComplemento)
+        public async Task CreateAsync(int idReserva, int idComplemento, int cantidad)
         {
-
             var entidad = new ReservaComplemento
             {
                 IdReserva = idReserva,
-                IdComplemento = idComplemento
+                IdComplemento = idComplemento,
+                Cantidad = cantidad
             };
 
             await _repository.CreateAsync(entidad);
         }
+
     }
 }

@@ -9,6 +9,7 @@ namespace HorizonCruises.Application.Services.Interfaces
 {
     public interface IServiceReservaComplementos
     {
-        Task CreateAsync(int idReserva, int idComplemento);
+        Task CreateAsync(int idReserva, int idComplemento, int cantidad);
+
     }
 }

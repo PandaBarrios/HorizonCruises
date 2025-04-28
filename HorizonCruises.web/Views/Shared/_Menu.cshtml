@@ -20,14 +20,19 @@
                 <li class="nav-item">
                     <a class="nav-link text-white" asp-controller="Habitacion" asp-action="Index">Habitaciones</a>
                 </li>
-                @if (User.IsInRole("Cliente")){
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-controller="Reserva" asp-action="">Mis Reservas</a>
-                </li>
 
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-controller="Huesped" asp-action="HuspedIndex">Compañeros de Viaje</a>
-                </li>
+                @{
+                    var idUsuario = User.FindFirst("IdUsuario")?.Value;
+                }
+
+                @if (User.IsInRole("Cliente")){
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Reserva" asp-action="IndexReservaCliente" asp-route-idUsuario="@idUsuario">Mis Reservas</a>
+                    </li>
+
+                   <li class="nav-item">
+                        <a class="nav-link text-white" asp-controller="Huesped" asp-action="HuspedIndex">Compañeros de Viaje</a>
+                   </li>
                 }
 
                 <!-- Dropdown Mantenimientos -->

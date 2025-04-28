@@ -52,5 +52,18 @@ namespace HorizonCruises.Application.Services.Implementations
             // Return lista 
             return collection;
         }
+
+        public async Task<ICollection<ReservaDTO>> ListAsyncCliente(int idUsuario)
+        {
+            // Obtener datos filtrados del repositorio
+            var list = await _repository.ListAsyncCliente(idUsuario);
+
+            // Mapear List<Reserva> a ICollection<ReservaDTO>
+            var collection = _mapper.Map<ICollection<ReservaDTO>>(list);
+
+            // Devolver la colección mapeada
+            return collection;
+        }
+
     }
 }

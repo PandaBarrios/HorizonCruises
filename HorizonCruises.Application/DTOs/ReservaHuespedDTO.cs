@@ -9,8 +9,6 @@ namespace HorizonCruises.Application.DTOs
 {
     public record ReservaHuespedDTO
     {
-        public int Id { get; set; }
-
         public int IdReserva{ get; set; }
 
         public int IdHuesped { get; set; }
