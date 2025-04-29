@@ -39,7 +39,6 @@ public partial class HorizonCruisesContext : DbContext
     public virtual DbSet<ReservaComplemento> ReservaComplemento { get; set; }
 
     public virtual DbSet<ReservaHabitacion> ReservaHabitacion { get; set; }
-    public virtual DbSet<ReservaHuesped> ReservaHuesped { get; set; }
 
     public virtual DbSet<Rol> Rol { get; set; }
 
@@ -53,6 +52,8 @@ public partial class HorizonCruisesContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.UseCollation("Latin1_General_CI_AI");
+
         modelBuilder.Entity<Barco>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Barco__3213E83F0231B40D");
@@ -198,9 +199,7 @@ public partial class HorizonCruisesContext : DbContext
 
             entity.Property(e => e.IdCrucero).HasColumnName("id_crucero");
             entity.Property(e => e.IdPuerto).HasColumnName("id_puerto");
-            entity.Property(e => e.Descripcion)
-                .HasMaxLength(50)
-                .HasColumnName("descripcion");
+            entity.Property(e => e.Descripcion).HasColumnName("descripcion");
             entity.Property(e => e.Orden).HasColumnName("orden");
 
             entity.HasOne(d => d.IdCruceroNavigation).WithMany(p => p.Itinerario)
@@ -279,19 +278,33 @@ public partial class HorizonCruisesContext : DbContext
                 .HasColumnType("decimal(18, 0)")
                 .HasColumnName("total");
 
-            entity.HasOne(d => d.IdCruceroNavigation)
-                .WithMany(p => p.Reserva)
+            entity.HasOne(d => d.IdCruceroNavigation).WithMany(p => p.Reserva)
                 .HasForeignKey(d => d.IdCrucero)
                 .HasConstraintName("FK_Reserva_Encabezado_Crucero");
 
-            entity.HasOne(d => d.IdUsuarioNavigation)
-                .WithMany(p => p.Reserva)
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Reserva)
                 .HasForeignKey(d => d.IdUsuario)
                 .HasConstraintName("FK_Factura_Encabezado_Usuario");
 
-            // Ya no hay relación many-to-many aquí porque se hace con la entidad explícita ReservaHuesped
+            entity.HasMany(d => d.IdHuesped).WithMany(p => p.IdReserva)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ReservaHuesped",
+                    r => r.HasOne<Huesped>().WithMany()
+                        .HasForeignKey("IdHuesped")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_Reserva_Huesped_Huesped"),
+                    l => l.HasOne<Reserva>().WithMany()
+                        .HasForeignKey("IdReserva")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_Reserva_Huesped_Reserva"),
+                    j =>
+                    {
+                        j.HasKey("IdReserva", "IdHuesped");
+                        j.ToTable("Reserva_Huesped");
+                        j.IndexerProperty<int>("IdReserva").HasColumnName("Id_reserva");
+                        j.IndexerProperty<int>("IdHuesped").HasColumnName("Id_huesped");
+                    });
         });
-
 
         modelBuilder.Entity<ReservaComplemento>(entity =>
         {
@@ -413,51 +426,21 @@ public partial class HorizonCruisesContext : DbContext
 
         modelBuilder.Entity<UsuarioHuesped>(entity =>
         {
-            entity.HasKey(e => e.Id); // <-- cambiar aquí, usar solo Id
             entity.ToTable("Usuario_Huesped");
 
-            entity.Property(e => e.Id).HasColumnName("Id"); // <-- nuevo
             entity.Property(e => e.IdHuesped).HasColumnName("id_huesped");
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
 
-            entity.HasOne(d => d.IdHuespedNavigation)
-                .WithMany()
+            entity.HasOne(d => d.IdHuespedNavigation).WithMany(p => p.UsuarioHuesped)
                 .HasForeignKey(d => d.IdHuesped)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Huesped_Huesped");
 
-            entity.HasOne(d => d.IdUsuarioNavigation)
-                .WithMany()
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.UsuarioHuesped)
                 .HasForeignKey(d => d.IdUsuario)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Usuario_Huesped_Usuario");
         });
-
-
-        modelBuilder.Entity<ReservaHuesped>(entity =>
-        {
-            entity.ToTable("Reserva_Huesped");
-
-            entity.HasKey(e => new { e.IdReserva, e.IdHuesped }).HasName("PK_Reserva_Huesped");
-
-            entity.Property(e => e.IdReserva).HasColumnName("id_reserva");
-            entity.Property(e => e.IdHuesped).HasColumnName("id_huesped");
-
-            entity.HasOne(d => d.IdReservaNavigation)
-                .WithMany(p => p.ReservaHuesped)
-                .HasForeignKey(d => d.IdReserva)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Reserva_Huesped_Reserva");
-
-            entity.HasOne(d => d.IdHuespedNavigation)
-                .WithMany(p => p.ReservaHuesped)
-                .HasForeignKey(d => d.IdHuesped)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Reserva_Huesped_Huesped");
-        });
-
-
-
 
         OnModelCreatingPartial(modelBuilder);
     }

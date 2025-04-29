@@ -31,8 +31,5 @@ public partial class Reserva
 
     public virtual ICollection<ReservaHabitacion> ReservaHabitacion { get; set; } = new List<ReservaHabitacion>();
 
-    public virtual ICollection<ReservaHuesped> ReservaHuesped { get; set; } = new List<ReservaHuesped>();
-
-
     public virtual ICollection<Huesped> IdHuesped { get; set; } = new List<Huesped>();
 }
