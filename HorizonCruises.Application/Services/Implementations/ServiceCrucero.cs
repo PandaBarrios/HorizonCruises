@@ -39,7 +39,12 @@ namespace HorizonCruises.Application.Services.Implementations
             return _mapper.Map<CruceroDTO>(cruceroCreado);
         }
 
-
+        public async Task<CruceroDTO> DetalleCrucero(int id)
+        {
+            var @object = await _repository.FindByIdAsync(id);
+            var objectMapped = _mapper.Map<CruceroDTO>(@object);
+            return objectMapped;
+        }
 
         public async Task<CruceroDTO> FindByIdAsync(int id)
         {

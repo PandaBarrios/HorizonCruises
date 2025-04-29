@@ -339,10 +339,10 @@
             const fechaLimitePago = new Date(fechaLimitePagoInput);
 
             // Crear fechas
-            const fechaDosMesesAntes = new Date(fechaInicio);
+            const fechaDosMesesAntes = new Date(fechaLimitePago);
             fechaDosMesesAntes.setDate(fechaDosMesesAntes.getDate() - 60);
 
-            const fechaUnMesAntes = new Date(fechaInicio);
+            const fechaUnMesAntes = new Date(fechaLimitePago);
             fechaUnMesAntes.setDate(fechaUnMesAntes.getDate() - 30);
 
             // Precios con descuento

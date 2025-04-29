@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Detalles del Crucero";
-
 }
 
 <div class="container mt-4">
@@ -38,144 +37,114 @@
                 <div class="card-body">
                     <h4>Fechas y Precios de Habitaciones</h4>
                     <hr />
-                    <!--Fecha de Inicio del VIaje-->
-                    @if (Model.FechaCrucero != null && Model.FechaCrucero.Count > 1)
-                    {
-                        int id = Model.Id;
 
-                        <h4 class="text-center text-secondary">
-                            <i class="bi bi-ship"></i> Fecha de Inicio: @Model.FechaCrucero[id].FechaInicio
-                        </h4>
-                    }
-                    else if (Model.FechaCrucero != null && Model.FechaCrucero.Any())
+                    @if (Model.FechaCrucero != null && Model.FechaCrucero.Any())
                     {
                         <h4 class="text-center text-secondary">
-                            <i class="bi bi-ship"></i> Fecha de Inicio: @Model.FechaCrucero.First().FechaInicio
+                            <i class="bi bi-calendar-event"></i> Fecha de Inicio: @Model.FechaCrucero.First().FechaInicio.ToString("dd/MM/yyyy")
                         </h4>
+
+                        <hr />
+
+                        @foreach (var fecha in Model.FechaCrucero)
+                        {
+                            <div class="mb-3">
+                                <h5>Precios dos meses antes del viaje: @fecha.FechaLimitePago.AddDays(-60).ToString("dd/MM/yyyy")</h5>
+                                @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
+                                {
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Habitación</th>
+                                                <th>Precio</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var precio in fecha.PrecioHabitacion)
+                                            {
+                                                if (precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-59))
+                                                {
+                                                    <tr>
+                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
+                                                        <td>₡ @precio.PrecioHabitacion1.ToString("N2", System.Globalization.CultureInfo.CreateSpecificCulture("es-CR"))</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <p>No hay precios definidos para esta fecha.</p>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <h5>Precios un mes antes del viaje: @fecha.FechaLimitePago.AddDays(-30).ToString("dd/MM/yyyy")</h5>
+                                @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
+                                {
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Habitación</th>
+                                                <th>Precio</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var precio in fecha.PrecioHabitacion)
+                                            {
+                                                if (precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-29) && precio.FechaLimitePrecio > fecha.FechaLimitePago.AddDays(-59))
+                                                {
+                                                    <tr>
+                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
+                                                        <td>₡ @precio.PrecioHabitacion1.ToString("N2", System.Globalization.CultureInfo.CreateSpecificCulture("es-CR"))</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <p>No hay precios definidos para esta fecha.</p>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <h5>Fecha límite de pago: @fecha.FechaLimitePago.ToString("dd/MM/yyyy")</h5>
+                                @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
+                                {
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Habitación</th>
+                                                <th>Precio</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var precio in fecha.PrecioHabitacion)
+                                            {
+                                                if (precio.FechaLimitePrecio == fecha.FechaLimitePago)
+                                                {
+                                                    <tr>
+                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
+                                                        <td>₡ @precio.PrecioHabitacion1.ToString("N2", System.Globalization.CultureInfo.CreateSpecificCulture("es-CR"))</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                                else
+                                {
+                                    <p>No hay precios definidos para esta fecha.</p>
+                                }
+                            </div>
+                        }
                     }
                     else
                     {
                         <p class="text-center text-danger">No hay fechas disponibles para este crucero.</p>
-                    }
-
-                    @if (Model.FechaCrucero != null && Model.FechaCrucero.Any())
-                    {
-
-
-                        <!--Un dos meses antes-->
-                        @foreach (var fecha in Model.FechaCrucero)
-                        {
-
-                            <div class="mb-3">
-                                <h5>Precios dos meses antes del viaje: @fecha.FechaLimitePago.AddDays(-60)</h5>
-                                @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
-                                {
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Habitación</th>
-                                                <th>Precio</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var precio in fecha.PrecioHabitacion)
-                                            {
-                                                @if (precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-59))
-                                                {
-                                                    <tr>
-                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
-                                                        <td>₡ @precio.PrecioHabitacion1.ToString()</td>
-                                                    </tr>
-                                                }
-
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-                                else
-                                {
-                                    <p>No hay precios definidos para esta fecha.</p>
-                                }
-                            </div>
-                        }
-                        <!--Aqui termina dos meses antes-->
-                        <hr>
-                        <!--Un meses antes-->
-                        @foreach (var fecha in Model.FechaCrucero)
-                        {
-
-                            <div class="mb-3">
-                                <h5>Precios un meses antes del viaje: @fecha.FechaLimitePago.AddDays(-30)</h5>
-                                @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
-                                {
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Habitación</th>
-                                                <th>Precio</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var precio in fecha.PrecioHabitacion)
-                                            {
-                                                @if (precio.FechaLimitePrecio < fecha.FechaLimitePago.AddDays(-29) && precio.FechaLimitePrecio > fecha.FechaLimitePago.AddDays(-59))
-                                                {
-                                                    <tr>
-                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
-                                                        <td>₡ @precio.PrecioHabitacion1.ToString()</td>
-                                                    </tr>
-                                                }
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-                                else
-                                {
-                                    <p>No hay precios definidos para esta fecha.</p>
-                                }
-                            </div>
-                        }
-                        <!--Aqui termina dos meses antes-->
-                        <hr />
-                        <!--Fecha Limite de pago-->
-                        @foreach (var fecha in Model.FechaCrucero)
-                        {
-
-                            <div class="mb-3">
-                                <h5>Fecha y precios del limite de pago: @fecha.FechaLimitePago</h5>
-                                @if (fecha.PrecioHabitacion != null && fecha.PrecioHabitacion.Any())
-                                {
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Habitación</th>
-                                                <th>Precio</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var precio in fecha.PrecioHabitacion)
-                                            {
-                                                @if (precio.FechaLimitePrecio == fecha.FechaLimitePago)
-                                                {
-                                                    <tr>
-                                                        <td>@precio.IdHabitacionNavigation.Nombre</td>
-                                                        <td>₡ @precio.PrecioHabitacion1</td>
-                                                    </tr>
-                                                }
-                                            }
-                                        </tbody>
-                                    </table>
-                                }
-                                else
-                                {
-                                    <p>No hay precios definidos para esta fecha.</p>
-                                }
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <p>No se han definido fechas para este crucero.</p>
                     }
                 </div>
             </div>
@@ -198,10 +167,10 @@
                         @foreach (var item in Model.Itinerario)
                         {
                             <tr>
-                                <td>@Html.DisplayFor(modelItem => item.Orden)</td>
-                                <td>@Html.DisplayFor(modelItem => item.IdPuertoNavigation.Pais)</td>
-                                <td>@Html.DisplayFor(modelItem => item.IdPuertoNavigation.Nombre)</td>
-                                <td>@Html.DisplayFor(modelItem => item.Descripcion)</td>
+                                <td>@item.Orden</td>
+                                <td>@item.IdPuertoNavigation.Pais</td>
+                                <td>@item.IdPuertoNavigation.Nombre</td>
+                                <td>@item.Descripcion</td>
                             </tr>
                         }
                     </tbody>
@@ -211,7 +180,6 @@
             <div class="d-flex justify-content-end mt-3">
                 <a class="btn btn-primary" asp-action="IndexAdmin">Regresar al listado</a>
             </div>
-            <hr />
         </div>
     </div>
 </div>

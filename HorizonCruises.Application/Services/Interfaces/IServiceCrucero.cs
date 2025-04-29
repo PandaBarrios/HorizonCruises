@@ -1,4 +1,5 @@
 ﻿using HorizonCruises.Application.DTOs;
+using HorizonCruises.Infraestructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace HorizonCruises.Application.Services.Interfaces
         Task<ICollection<CruceroDTO>> ListAsync();
         Task<CruceroDTO> FindByIdAsync(int id);
         Task<CruceroDTO> CreateAsync(CruceroDTO cruceroDTO);
+        Task<CruceroDTO> DetalleCrucero(int id);
     }
 }

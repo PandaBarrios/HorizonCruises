@@ -63,6 +63,32 @@ namespace HorizonCruises.web.Controllers
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<ActionResult> DetailsAdmin(int? id)
+        {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "Debe seleccionar un crucero válido.";
+                return RedirectToAction("IndexAdmin");
+            }
+
+            try
+            {
+                var crucero = await _serviceCrucero.DetalleCrucero(id.Value);
+
+                if (crucero == null)
+                {
+                    TempData["ErrorMessage"] = "El crucero no existe.";
+                    return RedirectToAction("IndexAdmin");
+                }
+
+                return View(crucero);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error inesperado: {ex.Message}";
+                return RedirectToAction("IndexAdmin");
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> ObtenerImagen(int id)
@@ -209,31 +235,6 @@ namespace HorizonCruises.web.Controllers
             }
         }
 
-
-
-        public async Task<ActionResult> DetailsAdmin(int? id)
-        {
-            try
-            {
-                if (id == null)
-                {
-                    return RedirectToAction("IndexAdmin");
-                }
-                var @object = await _serviceCrucero.FindByIdAsync(id.Value);
-                if (@object == null)
-                {
-                    throw new Exception("Crucero no existente");
-
-                }
-
-                return View(@object);
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
 
         [HttpGet]
         public async Task<IActionResult> GetHabitacionesPorBarco(int idBarco)

@@ -58,14 +58,46 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
 
         public async Task<ICollection<Crucero>> ListAsync()
         {
+            var hoy = DateOnly.FromDateTime(DateTime.Today);
+
             var collection = await _context.Set<Crucero>()
-                         .Include(x => x.IdBarcoNavigation)
-                         .AsNoTracking()
-                         .ToListAsync();
+                .Include(x => x.IdBarcoNavigation)
+                .Include(x => x.FechaCrucero) 
+                .AsNoTracking()
+                .Where(c => c.FechaCrucero.Any(f => f.FechaInicio > hoy))
+                .ToListAsync();
 
             return collection;
         }
 
-        
+
+        public async Task<Crucero> DetalleCrucero(int id)
+        {
+            var crucero = await _context.Set<Crucero>()
+                .Where(x => x.Id == id)
+                .Include(x => x.IdBarcoNavigation) // Información del Barco
+                    .ThenInclude(b => b.BarcoHabitaciones)
+                        .ThenInclude(bh => bh.IdHabitacionNavigation)
+                .Include(x => x.Itinerario) // Itinerario
+                    .ThenInclude(it => it.IdPuertoNavigation)
+                        .ThenInclude(p => p.IdDestinoNavigation) // Para saber de qué destino es el puerto
+                .Include(x => x.FechaCrucero) // Fechas del crucero
+                    .ThenInclude(fc => fc.PrecioHabitacion) // Precios de habitaciones
+                        .ThenInclude(ph => ph.IdHabitacionNavigation) // Información de la habitación
+                .FirstOrDefaultAsync();
+
+            if (crucero == null)
+            {
+                throw new Exception("Crucero no encontrado.");
+            }
+
+            // Ordenar el itinerario por orden de visita
+            crucero.Itinerario = crucero.Itinerario.OrderBy(i => i.Orden).ToList();
+
+            return crucero;
+        }
+
+
+
     }
 }
