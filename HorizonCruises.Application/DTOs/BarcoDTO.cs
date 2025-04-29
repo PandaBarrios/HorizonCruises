@@ -21,6 +21,6 @@ namespace HorizonCruises.Application.DTOs
         [Display(Name = "Capacidad de Huéspedes")]
         public int? CapacidadHuespedes { get; set; }
         public virtual ICollection<BarcoHabitaciones> BarcoHabitaciones { get; set; } = new List<BarcoHabitaciones>();
-        public virtual ICollection<Crucero> Crucero { get; set; } = new List<Crucero>();
+        public virtual ICollection<CruceroDTO> Crucero { get; set; } = new List<CruceroDTO>();
     }
 }

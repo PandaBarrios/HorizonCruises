@@ -15,6 +15,8 @@
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
+                <input type="hidden" asp-for="Id" />
+
                 <!-- Nombre del Barco -->
                 <div class="form-group mb-3">
                     <label asp-for="Nombre" class="control-label"></label>
@@ -43,20 +45,58 @@
 
                     <!-- Aquí se renderiza la lista de habitaciones seleccionadas -->
                     <div id="habitacionesList">
-                        <!-- Las habitaciones serán cargadas dinámicamente -->
+                        @if (ViewBag.HabitacionesAsignadas != null)
+                        {
+                            foreach (var habitacion in ViewBag.HabitacionesAsignadas)
+                            {
+                                <div class="habitacion-item">
+                                    <div class="form-group mb-3">
+                                        <label>Selecciona una habitación</label>
+                                        <select name="BarcoHabitaciones[0].IdHabitacion" class="form-control">
+                                            @foreach (var h in ViewBag.Habitaciones)
+                                            {
+                                                if (habitacion.IdHabitacion == h.Id)
+                                                {
+                                                    <option value="@h.Id" selected>@h.Nombre</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@h.Id">@h.Nombre</option>
+                                                }
+                                            }
+                                        </select>
+
+                                        <label>Cantidad disponible</label>
+                                        <input type="number"
+                                               name="BarcoHabitaciones[0].TotalHabitacionesDisponibles"
+                                               value="@habitacion.TotalHabitacionesDisponibles"
+                                               class="form-control mt-2"
+                                               placeholder="Cantidad disponible" />
+
+                                        <button type="button" class="btn btn-danger mt-2" onclick="eliminarHabitacion(this)">Eliminar</button>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
+
+
+
                 </div>
 
                 <div class="form-group text-center">
                     <input type="submit" value="Guardar Cambios" class="btn btn-primary btn-lg" />
                 </div>
+
+                <input type="hidden" id="habitacionesJson" name="habitacionesJson" />
+
             </form>
         </div>
     </div>
 </div>
 
 <div class="text-center mt-4">
-    <a asp-action="Index" class="btn btn-secondary btn-lg">Volver a la lista</a>
+    <a asp-action="IndexAdmin" class="btn btn-secondary btn-lg">Volver a la lista</a>
 </div>
 
 
@@ -80,10 +120,10 @@
             <div class="form-group mb-3">
                 <label>Selecciona una habitación</label>
                 <select name="BarcoHabitaciones[0].IdHabitacion" class="form-control">
-    @foreach (var habitacion in ViewBag.Habitaciones)
-    {
-                            <option value="@habitacion.Id">@habitacion.Nombre</option>
-    }
+                    @foreach (var habitacion in ViewBag.Habitaciones)
+                    {
+                     <option value="@habitacion.Id">@habitacion.Nombre</option>
+                    }
                 </select>
                 <label>Cantidad disponible</label>
                 <input type="number" name="BarcoHabitaciones[0].TotalHabitacionesDisponibles" placeholder="Cantidad disponible" class="form-control mt-2" />
@@ -91,6 +131,8 @@
             </div>
         `;
 
+        
+        console.log("Enviando habitaciones:", habitacionesSeleccionadas);
         // Agrega el contenedor al div de habitaciones
         container.appendChild(div);
     }
@@ -99,4 +141,44 @@
     function eliminarHabitacion(button) {
         button.closest(".habitacion-item").remove(); // Elimina el contenedor de la habitación
     }
+
 </script>
+
+<script>
+    let habitacionesSeleccionadas = []; 
+
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function () {
+            const json = JSON.stringify(habitacionesSeleccionadas);
+            document.getElementById("habitacionesJson").value = json;
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form");
+        form.addEventListener("submit", function () {
+            let habitaciones = [];
+
+            // Recorre cada .habitacion-item para obtener los datos
+            document.querySelectorAll(".habitacion-item").forEach(item => {
+                const idHabitacion = parseInt(item.querySelector('select').value);
+                const cantidad = parseInt(item.querySelector('input[type="number"]').value);
+
+                if (!isNaN(idHabitacion) && !isNaN(cantidad)) {
+                    habitaciones.push({
+                        IdHabitacion: idHabitacion,
+                        TotalHabitacionesDisponibles: cantidad
+                    });
+                }
+            });
+
+            // Guardamos en el input hidden
+            document.getElementById("habitacionesJson").value = JSON.stringify(habitaciones);
+        });
+    });
+</script>
+

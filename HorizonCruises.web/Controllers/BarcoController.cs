@@ -1,9 +1,11 @@
 ﻿using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Interfaces;
 using HorizonCruises.Infraestructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using X.PagedList.Extensions;
 
 namespace HorizonCruises.web.Controllers
@@ -12,26 +14,31 @@ namespace HorizonCruises.web.Controllers
     {
         private readonly IServiceBarco _serviceBarco;
         private readonly IServiceHabitacion _serviceHabitacion;
+        private readonly IServiceBarcoHabitaciones _serviceBarcoHabitacion;
 
-        public BarcoController(IServiceBarco barcoService, IServiceHabitacion habitacionService)
+        public BarcoController(IServiceBarco serviceBarco, IServiceHabitacion serviceHabitacion, IServiceBarcoHabitaciones serviceBarcoHabitacion)
         {
-            _serviceBarco = barcoService;
-            _serviceHabitacion = habitacionService;
+            _serviceBarco = serviceBarco;
+            _serviceHabitacion = serviceHabitacion;
+            _serviceBarcoHabitacion = serviceBarcoHabitacion;
         }
 
         [HttpGet]
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Index()
         {
             var collection = await _serviceBarco.ListAsync();
             return View(collection);
         }
 
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> IndexAdmin(int? page)
         {
             var collection = await _serviceBarco.ListAsync();
             return View(collection.ToPagedList(page ?? 1, 5));
         }
 
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Details(int id)
         {
             var barco = await _serviceBarco.FindByIdAsync(id);
@@ -39,6 +46,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create()
         {
             var habitaciones = await _serviceHabitacion.ListAsync();
@@ -48,6 +56,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create(BarcoDTO dto)
         {
             var habitaciones = await _serviceHabitacion.ListAsync();
@@ -82,8 +91,9 @@ namespace HorizonCruises.web.Controllers
 
             return RedirectToAction(nameof(IndexAdmin));
         }
-    
+
         // GET: BarcoController/Edit/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var barco = await _serviceBarco.FindByIdAsync(id);
@@ -93,68 +103,65 @@ namespace HorizonCruises.web.Controllers
                 return NotFound();
             }
 
-            // Pasar la lista de habitaciones del barco a la vista
+            // PASO 1: Cargar todas las habitaciones disponibles
             ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
-            // Extraer solo los IdHabitacion asociados al barco
-            ViewBag.HabitacionesSeleccionadas = barco.BarcoHabitaciones.Select(bh => bh.IdHabitacion).ToList();
+
+            // PASO 2: Obtener habitaciones ASIGNADAS (habitaciones actuales del barco)
+            var habitacionesAsignadas = await _serviceBarcoHabitacion.GetHabitacionesByBarcoAsync(id); // ← Aquí llamas al método correcto que ya tienes&#8203;:contentReference[oaicite:3]{index=3}
+
+            ViewBag.HabitacionesAsignadas = habitacionesAsignadas; // ← Pasarlas al Razor
 
             return View(barco);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, BarcoDTO barcoDTO)
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Edit(int id, BarcoDTO barcoDTO, string habitacionesJson)
         {
             if (id != barcoDTO.Id)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
                 var barco = await _serviceBarco.FindByIdAsync(id);
 
                 if (barco == null)
-                {
                     return NotFound();
-                }
 
-                // **1. Limpiar las habitaciones del barco**
                 barco.BarcoHabitaciones.Clear();
 
-                // **2. Agregar las habitaciones seleccionadas**
-                if (barcoDTO.BarcoHabitaciones != null)
+                var habitaciones = JsonSerializer.Deserialize<List<BarcoHabitacionesDTO>>(habitacionesJson);
+
+                if (habitaciones != null)
                 {
-                    foreach (var habitacionDTO in barcoDTO.BarcoHabitaciones)
+                    foreach (var habitacion in habitaciones)
                     {
                         barco.BarcoHabitaciones.Add(new BarcoHabitaciones
                         {
-                            IdHabitacion = habitacionDTO.IdHabitacion,
-                            TotalHabitacionesDisponibles = habitacionDTO.TotalHabitacionesDisponibles
+                            IdBarco = barco.Id,
+                            IdHabitacion = habitacion.IdHabitacion,
+                            TotalHabitacionesDisponibles = habitacion.TotalHabitacionesDisponibles
                         });
                     }
                 }
 
-                // **3. Actualizar la información del barco**
                 barco.Nombre = barcoDTO.Nombre;
                 barco.Descripcion = barcoDTO.Descripcion;
                 barco.CapacidadHuespedes = barcoDTO.CapacidadHuespedes;
 
-                // **4. Guardar cambios usando el servicio**
                 var result = await _serviceBarco.UpdateAsync(barco);
 
                 if (!result)
-                {
                     return BadRequest("No se pudo actualizar el barco.");
-                }
 
                 return RedirectToAction(nameof(Index));
             }
 
-            // Recargar lista de habitaciones si hay error
             ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
-
             return View(barcoDTO);
         }
+
     }
 }
