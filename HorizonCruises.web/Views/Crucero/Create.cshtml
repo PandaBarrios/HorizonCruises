@@ -20,16 +20,6 @@
             <span asp-validation-for="Nombre" class="text-danger"></span>
         </div>
 
-        <!-- Selección de Barco -->
-        <div class="mb-4">
-            <label asp-for="IdBarco" class="form-label fw-bold">Seleccionar Barco</label>
-            <select asp-for="IdBarco" class="form-select form-select-lg"
-                    asp-items="@(new SelectList(ViewBag.ListBarco, "Id", "Nombre"))">
-                <option value="">Seleccione un barco</option>
-            </select>
-            <span asp-validation-for="IdBarco" class="text-danger"></span>
-        </div>
-
         <!-- Imagen -->
         <div class="mb-4">
             <label asp-for="Imagen" class="form-label fw-bold">Imagen del Crucero</label>
@@ -66,7 +56,9 @@
             </div>
         </div>
 
-       
+
+
+        <!-------------------------------------------------------------------------------------- Habitaciones --------------------------->
         <!-- Fecha de Inicio -->
         <div class="mb-4">
             <label class="form-label fw-bold">El viaje comenienza</label>
@@ -74,14 +66,53 @@
             <span class="text-danger"></span>
         </div>
 
+        <!-- Select de Barcos -->
+        <div class="mb-4">
+            <label asp-for="IdBarco" class="form-label fw-bold">Seleccionar Barco</label>
+            <select asp-for="IdBarco" class="form-select form-select-lg" id="IdBarco" onchange="cargarHabitaciones()">
+                <option value=""> Selecciona un barco </option>
+                @foreach (var barco in ViewBag.ListBarco)
+                {
+                    <option value="@barco.Id">@barco.Nombre</option>
+                }
+            </select>
+            <span asp-validation-for="IdBarco" class="text-danger"></span>
+        </div>
+
+
+                <!-- Select dinámico de Habitaciones -->
+       <div class="mb-4" id="contenedor-habitaciones" style="display: none;">
+            <label class="form-label fw-bold">Seleccionar Habitación</label>
+            <select class="form-select form-select-lg" id="select-habitacion">
+                    <option value="">-- Selecciona una habitación --</option>
+            </select>
+       </div>
+
+                <!-- Precio de la Habitación -->
+       <div class="mb-4" id="contenedor-precio" style="display: none;">
+           <label class="form-label fw-bold">Precio de la Habitación (₡)</label>
+           <input type="number" id="precio-habitacion" class="form-control form-control-lg" min="0" step="0.01" />
+       </div>
+
         <!-- Fecha Límite de Pago -->
         <div class="mb-4">
             <label class="form-label fw-bold">Fecha Límite de Pago</label>
             <input type="date" class="form-control form-control-lg" id="FechaLimitePago" disabled />
-            <span  class="text-danger"></span>
+            <span class="text-danger"></span>
         </div>
 
+                <!-- Botón Agregar -->
+       <div class="mb-4" id="contenedor-agregar" style="display: none;">
+           <button type="button" class="btn btn-primary" onclick="agregarHabitacion()">Agregar Precio</button>
+       </div>
 
+        <!-- Vista de Precios Generados -->
+        <div id="vista-precios" class="mt-5"></div>
+
+
+        <input type="hidden" name="preciosHabitacionesJson" id="preciosHabitacionesJson" />
+
+           
 
         <!-- Botón para enviar el formulario -->
         <input type="hidden" id="itinerarioJson" name="itinerarioJson" />
@@ -155,6 +186,20 @@
               event.preventDefault();
                 return;
              }
+
+            // Validar que no se repita el puerto
+            // const yaExiste = $("#detalleItinerario tbody tr").find(`input[value="${puertoId}"]`).length > 0;
+            //     if (yaExiste) {
+            //         Swal.fire({
+            //             icon: 'error',
+            //             title: 'Puerto duplicado',
+            //             text: 'Este puerto ya ha sido agregado al itinerario.',
+            //             confirmButtonColor: '#d33',
+            //             confirmButtonText: 'Ok'
+            //         });
+            //         return;
+            //     }
+
 
             // Crear una nueva fila con el nuevo orden
             const newRow = `
@@ -253,7 +298,246 @@
         });
     </script>
 
-    <!-- Utilida Guardar Crucero -->
+    <!------------------------------------------------------------------- Utilidad Habitaciones del barco seleccionado ------------------>
+
+    <script>
+
+        let preciosHabitaciones = [];
+
+        function agregarHabitacion() {
+            const habitacionId = document.getElementById('select-habitacion').value;
+            const habitacionNombre = document.getElementById('select-habitacion').selectedOptions[0]?.textContent;
+            const precioOriginal = parseFloat(document.getElementById('precio-habitacion').value);
+            const fechaInicioInput = document.getElementById('FechaInicio').value;
+            const fechaLimitePagoInput = document.getElementById('FechaLimitePago').value;
+
+            if (!habitacionId || isNaN(precioOriginal) || !fechaInicioInput || !fechaLimitePagoInput) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debe seleccionar habitación, precio y fechas.',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'Ok'
+                });
+                return;
+            }
+
+            // Verificar si ya existe esa habitación agregada
+           const yaExiste = preciosHabitaciones.some(p => p.habitacionId === habitacionId && p.tipo === "FechaLimite");
+             if (yaExiste) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Habitación ya agregada',
+                    text: 'Esta habitación ya tiene precios registrados.',
+                    confirmButtonColor: '#f8bb86',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+             }
+
+            const fechaInicio = new Date(fechaInicioInput);
+            const fechaLimitePago = new Date(fechaLimitePagoInput);
+
+            // Crear fechas
+            const fechaDosMesesAntes = new Date(fechaInicio);
+            fechaDosMesesAntes.setDate(fechaDosMesesAntes.getDate() - 60);
+
+            const fechaUnMesAntes = new Date(fechaInicio);
+            fechaUnMesAntes.setDate(fechaUnMesAntes.getDate() - 30);
+
+            // Precios con descuento
+            const precioDosMesesAntes = (precioOriginal * 0.85).toFixed(2); // 15% descuento
+            const precioUnMesAntes = (precioOriginal * 0.90).toFixed(2);    // 10% descuento
+
+            // Agregar precios
+            preciosHabitaciones.push({
+                habitacionId,
+                habitacionNombre,
+                precio: precioDosMesesAntes,
+                fechaLimite: fechaDosMesesAntes.toISOString().split('T')[0],
+                tipo: "DosMesesAntes"
+            });
+
+            preciosHabitaciones.push({
+                habitacionId,
+                habitacionNombre,
+                precio: precioUnMesAntes,
+                fechaLimite: fechaUnMesAntes.toISOString().split('T')[0],
+                tipo: "UnMesAntes"
+            });
+
+            preciosHabitaciones.push({
+                habitacionId,
+                habitacionNombre,
+                precio: precioOriginal.toFixed(2),
+                fechaLimite: fechaLimitePago.toISOString().split('T')[0],
+                tipo: "FechaLimite"
+            });
+
+            actualizarVistaPrecios();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Precios agregados correctamente',
+            text: 'Se han generado los precios para esta habitación.',
+            showConfirmButton: false,
+            timer: 1800
+        });
+
+        }
+
+
+        function actualizarVistaPrecios() {
+            const contenedor = document.getElementById('vista-precios');
+            contenedor.innerHTML = '';
+
+            const preciosDosMeses = preciosHabitaciones.filter(p => p.tipo === "DosMesesAntes");
+            const preciosUnMes = preciosHabitaciones.filter(p => p.tipo === "UnMesAntes");
+            const preciosFechaLimite = preciosHabitaciones.filter(p => p.tipo === "FechaLimite");
+
+            const grupos = [
+                { titulo: "Precios dos meses antes del viaje", precios: preciosDosMeses },
+                { titulo: "Precios un mes antes del viaje", precios: preciosUnMes },
+                { titulo: "Precios para fecha límite de pago", precios: preciosFechaLimite }
+            ];
+
+            grupos.forEach(g => {
+                if (g.precios.length > 0) {
+                    const section = document.createElement('div');
+                    section.innerHTML = `
+                        <h5 class="text-primary mb-3">${g.titulo}</h5>
+                        <table class="table table-bordered mb-5">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Habitación</th>
+                                    <th>Precio</th>
+                                    <th>Fecha Límite</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${g.precios.map((p) => {
+                                    // Convertir fecha al formato dd/mm/yyyy
+                                    const fechaObj = new Date(p.fechaLimite);
+                                    const fechaFormateada = fechaObj.toLocaleDateString('es-CR', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric'
+                                    });
+
+                                    return `
+                                        <tr>
+                                            <td>${p.habitacionNombre}</td>
+                                            <td>₡${parseFloat(p.precio).toLocaleString('es-CR', { minimumFractionDigits: 2 })}</td>
+                                            <td>${fechaFormateada}</td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarHabitacionPrecio('${p.habitacionId}')">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                    contenedor.appendChild(section);
+                }
+            });
+
+        const fechaInicioInput = document.getElementById('FechaInicio');
+        const barcoSelect = document.getElementById('IdBarco');
+
+            if (preciosHabitaciones.length > 0) {
+                fechaInicioInput.setAttribute('disabled', 'disabled');
+                barcoSelect.setAttribute('disabled', 'disabled');
+            } else {
+                fechaInicioInput.removeAttribute('disabled');
+                barcoSelect.removeAttribute('disabled');
+            }
+
+        }
+
+
+        function eliminarHabitacionPrecio(habitacionId) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Se eliminarán todos los precios de esta habitación.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Eliminar todos los precios de esa habitación
+                    preciosHabitaciones = preciosHabitaciones.filter(p => p.habitacionId !== habitacionId);
+
+                    // Actualizar las tablas
+                    actualizarVistaPrecios();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Habitación eliminada',
+                        text: 'Se han eliminado los precios de esta habitación.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+        }
+
+
+
+        async function cargarHabitaciones() {
+            const barcoId = document.getElementById('IdBarco').value;
+            const contenedorHabitaciones = document.getElementById('contenedor-habitaciones');
+            const selectHabitacion = document.getElementById('select-habitacion');
+            const contenedorPrecio = document.getElementById('contenedor-precio');
+            const contenedorAgregar = document.getElementById('contenedor-agregar');
+
+            console.log("ID del barco seleccionado:", barcoId);
+
+            if (!barcoId) {
+                contenedorHabitaciones.style.display = 'none';
+                contenedorPrecio.style.display = 'none';
+                contenedorAgregar.style.display = 'none';
+                selectHabitacion.innerHTML = '<option value=""> Selecciona una habitación </option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Crucero/GetHabitacionesPorBarco?idBarco=${barcoId}`);
+                if (!response.ok) {
+                    throw new Error('Error al cargar las habitaciones');
+                }
+
+                const habitaciones = await response.json();
+
+                // Limpiar y agregar nuevas opciones
+                selectHabitacion.innerHTML = '<option value=""> Selecciona una habitación </option>';
+                habitaciones.forEach(hab => {
+                    const option = document.createElement('option');
+                    option.value = hab.id;
+                    option.textContent = `${hab.nombre} - Tipo: ${hab.tipo}`;
+                    selectHabitacion.appendChild(option);
+                });
+
+                contenedorHabitaciones.style.display = 'block';
+                contenedorPrecio.style.display = 'block';
+                contenedorAgregar.style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                alert('No se pudieron cargar las habitaciones.');
+            }
+        }
+
+    </script>
+
+
+    <!------------------------------------------------------------------------- Utilida Guardar Crucero --------------------------------->
     <script>
           $(document).ready(function () {
             $("form").submit(function (event) {
@@ -263,6 +547,8 @@
                 let fechaInicio = $("#FechaInicio").val();
                 let fechaLimitePago = $("#FechaLimitePago").val();
                 let itinerario = [];
+
+                console.log(barcoSeleccionado);
 
                 // Validar Nombre del Crucero (Debe contener al menos una letra)
                 if (!/.*[a-zA-Z]+.*/.test(nombreCrucero)) {
@@ -329,6 +615,17 @@
                     return;
                 }
 
+               // Agregar hidden para IdBarco si el select está disabled
+               if ($("#IdBarco").is(':disabled')) {
+                 if (!$("input[name='IdBarco']").length) {
+                    $("<input>").attr({
+                        type: "hidden",
+                        name: "IdBarco",
+                        value: $("#IdBarco").val()
+                    }).appendTo("form");
+                 }
+                }
+
                 // Eliminar inputs ocultos previos (por si el formulario se envía varias veces)
                 $("input[name='FechaInicio']").remove();
                 $("input[name='FechaLimitePago']").remove();
@@ -371,7 +668,14 @@
                     return;
                 }
 
-                // Convertir itinerario a JSON y enviarlo
+               // Preparar JSON para servidor
+              let preciosHabitacionesParaServidor = preciosHabitaciones.map(p => ({
+                  IdHabitacion: parseInt(p.habitacionId),
+                  PrecioHabitacion1: parseFloat(p.precio),
+                  FechaLimitePrecio: p.fechaLimite
+               }));
+
+                $("#preciosHabitacionesJson").val(JSON.stringify(preciosHabitacionesParaServidor));      
                 $("#itinerarioJson").val(JSON.stringify(itinerario));
             });
         });

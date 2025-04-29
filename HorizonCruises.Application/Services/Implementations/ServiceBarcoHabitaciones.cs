@@ -44,6 +44,13 @@ namespace HorizonCruises.Application.Services.Implementations
             return objectMapped;
         }
 
+        public async Task<ICollection<HabitacionDTO>> HabitacionesPorBarcoAsync(int idBarco)
+        {
+            var @object = await _repository.HabitacionesPorBarcoAsync(idBarco);
+            var objectMapped = _mapper.Map<ICollection<HabitacionDTO>>(@object);
+            return objectMapped;
+        }
+
         public async Task<ICollection<BarcoHabitacionesDTO>> ListAsync()
         {
             var list = await _repository.ListAsync();

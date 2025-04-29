@@ -39,6 +39,24 @@ namespace HorizonCruises.Application.Services.Implementations
             return _mapper.Map<FechaCruceroDTO>(fechaCreada);
         }
 
+        public async Task<PrecioHabitacionDTO> CreatePrecioHabitacionAsync(PrecioHabitacionDTO precioHabitacionDTO)
+        {
+            if (precioHabitacionDTO == null)
+            {
+                throw new ArgumentNullException(nameof(precioHabitacionDTO), "El precio de habitación no puede ser nulo.");
+            }
+
+            // Mapear DTO a entidad
+            var entity = _mapper.Map<PrecioHabitacion>(precioHabitacionDTO);
+
+            // Llamar al repositorio para guardar
+            var entityCreada = await _repository.CreatePrecioHabitacionAsync(entity);
+
+            // Mapear de nuevo a DTO
+            return _mapper.Map<PrecioHabitacionDTO>(entityCreada);
+        }
+
+
         public async Task<FechaCruceroDTO> FindByIdAsync(int id)
         {
             var @object = await _repository.FindByIdAsync(id);

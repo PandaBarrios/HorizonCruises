@@ -12,5 +12,7 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
         Task<ICollection<FechaCrucero>> ListAsync();
         Task<FechaCrucero> FindByIdAsync(int id);
         Task<FechaCrucero> CreateAsync(FechaCrucero nFecha);
+        Task<PrecioHabitacion> CreatePrecioHabitacionAsync(PrecioHabitacion precioHabitacionDTO);
+
     }
 }

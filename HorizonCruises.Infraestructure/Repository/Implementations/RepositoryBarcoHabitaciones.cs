@@ -68,5 +68,14 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                           .FirstOrDefaultAsync(b => b.IdHabitacion == id);
 
         }
+
+        public async Task<ICollection<Habitacion>> HabitacionesPorBarcoAsync(int idBarco)
+        {
+            return await _context.BarcoHabitaciones
+                    .Where(bh => bh.IdBarco == idBarco)
+                    .Include(bh => bh.IdHabitacionNavigation)
+                    .Select(bh => bh.IdHabitacionNavigation) 
+                    .ToListAsync();
+        }
     }
 }

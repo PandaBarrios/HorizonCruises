@@ -33,6 +33,20 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             return entityEntry.Entity;
         }
 
+        public async Task<PrecioHabitacion> CreatePrecioHabitacionAsync(PrecioHabitacion precioHabitacion)
+        {
+            if (precioHabitacion == null)
+            {
+                throw new ArgumentNullException(nameof(precioHabitacion), "El precio de habitación no puede ser nulo.");
+            }
+
+            var entityEntry = await _context.Set<PrecioHabitacion>().AddAsync(precioHabitacion);
+            await _context.SaveChangesAsync();
+
+            return entityEntry.Entity;
+        }
+
+
         public async Task<FechaCrucero> FindByIdAsync(int id)
         {
             var @object = await _context.Set<FechaCrucero>()

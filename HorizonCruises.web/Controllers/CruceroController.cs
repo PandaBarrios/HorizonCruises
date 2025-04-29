@@ -16,17 +16,19 @@ namespace HorizonCruises.web.Controllers
         private readonly IServiseItinerario _serviceItinerario;
         private readonly IServicePuerto _servicePuerto;
         private readonly IServiceFechaCrucero _serviceFechaCrucero;
+        private readonly IServiceBarcoHabitaciones _serviceBarcoHabitaciones;
 
         private readonly IServiceReserva _serviceReserva;
         private readonly ILogger<ServiceCrucero> _logger;
 
-        public CruceroController(IServiceCrucero serviceCrucero, IServiceBarco serviceBarco, IServiseItinerario serviceItinerario, IServicePuerto servicePuerto, IServiceFechaCrucero serviceFechaCrucero, IServiceReserva serviceReserva, ILogger<ServiceCrucero> logger)
+        public CruceroController(IServiceCrucero serviceCrucero, IServiceBarco serviceBarco, IServiseItinerario serviceItinerario, IServicePuerto servicePuerto, IServiceFechaCrucero serviceFechaCrucero, IServiceBarcoHabitaciones serviceBarcoHabitaciones, IServiceReserva serviceReserva, ILogger<ServiceCrucero> logger)
         {
             _serviceCrucero = serviceCrucero;
             _serviceBarco = serviceBarco;
             _serviceItinerario = serviceItinerario;
             _servicePuerto = servicePuerto;
             _serviceFechaCrucero = serviceFechaCrucero;
+            _serviceBarcoHabitaciones = serviceBarcoHabitaciones;
             _serviceReserva = serviceReserva;
             _logger = logger;
         }
@@ -94,10 +96,11 @@ namespace HorizonCruises.web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CruceroDTO cruceroDTO,
-                                        IFormFile ImageFile,
-                                        string itinerarioJson,
-                                        string FechaInicio,
-                                        string FechaLimitePago)
+                                         IFormFile ImageFile,
+                                         string itinerarioJson,
+                                         string FechaInicio,
+                                         string FechaLimitePago,
+                                         string preciosHabitacionesJson)
         {
             try
             {
@@ -121,6 +124,32 @@ namespace HorizonCruises.web.Controllers
                     return View(cruceroDTO);
                 }
 
+                // Validar que no existan puertos repetidos
+                var puertosDuplicados = itinerario.GroupBy(i => i.IdPuerto)
+                                                  .Where(g => g.Count() > 1)
+                                                  .Select(g => g.Key)
+                                                  .ToList();
+
+                if (puertosDuplicados.Any())
+                {
+                    ModelState.AddModelError(string.Empty, "No puede haber puertos repetidos en el itinerario.");
+                    ViewBag.ListBarco = await _serviceBarco.ListAsync();
+                    ViewBag.ListPuerto = await _servicePuerto.ListAsync();
+                    return View(cruceroDTO);
+                }
+
+
+                // Deserializar los precios habitaciones
+                var preciosHabitaciones = JsonSerializer.Deserialize<List<PrecioHabitacionDTO>>(preciosHabitacionesJson);
+
+                if (preciosHabitaciones == null || !preciosHabitaciones.Any())
+                {
+                    ModelState.AddModelError("Precios", "Debe agregar precios para las habitaciones.");
+                    ViewBag.ListBarco = await _serviceBarco.ListAsync();
+                    ViewBag.ListPuerto = await _servicePuerto.ListAsync();
+                    return View(cruceroDTO);
+                }
+
                 // Validar y convertir fechas
                 if (!DateOnly.TryParseExact(FechaInicio, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly fechaInicioConvertida) ||
                     !DateOnly.TryParseExact(FechaLimitePago, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly fechaLimiteConvertida))
@@ -134,17 +163,17 @@ namespace HorizonCruises.web.Controllers
                 // Establecer la cantidad de días
                 cruceroDTO.CantidadDias = itinerario.Count;
 
-                // Guardar crucero
+                // Guardar el Crucero
                 var cruceroCreado = await _serviceCrucero.CreateAsync(cruceroDTO);
 
-                // Guardar el itinerario
+                // Guardar el Itinerario
                 foreach (var item in itinerario)
                 {
                     item.IdCrucero = cruceroCreado.Id;
                     await _serviceItinerario.CreateAsync(item);
                 }
 
-                // Guardar Fecha Crucero
+                // Guardar la Fecha Crucero
                 var fechaCrucero = new FechaCruceroDTO
                 {
                     IdCrucero = cruceroCreado.Id,
@@ -152,19 +181,34 @@ namespace HorizonCruises.web.Controllers
                     FechaLimitePago = fechaLimiteConvertida
                 };
 
-                await _serviceFechaCrucero.CreateAsync(fechaCrucero);
+                var fechaCruceroCreada = await _serviceFechaCrucero.CreateAsync(fechaCrucero);
+
+                // Guardar precios de habitaciones
+                foreach (var precio in preciosHabitaciones)
+                {
+                    var nuevoPrecio = new PrecioHabitacionDTO
+                    {
+                        IdCruceroFecha = fechaCruceroCreada.Id,
+                        IdHabitacion = precio.IdHabitacion,
+                        PrecioHabitacion1 = precio.PrecioHabitacion1,
+                        FechaLimitePrecio = precio.FechaLimitePrecio
+                    };
+
+                    await _serviceFechaCrucero.CreatePrecioHabitacionAsync(nuevoPrecio);
+                }
 
                 return RedirectToAction("IndexAdmin");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear el crucero y su itinerario.");
+                _logger.LogError(ex, "Error al crear el crucero y sus componentes.");
                 ModelState.AddModelError(string.Empty, "Ocurrió un error al crear el crucero.");
                 ViewBag.ListBarco = await _serviceBarco.ListAsync();
                 ViewBag.ListPuerto = await _servicePuerto.ListAsync();
                 return View(cruceroDTO);
             }
         }
+
 
 
         public async Task<ActionResult> DetailsAdmin(int? id)
@@ -191,7 +235,12 @@ namespace HorizonCruises.web.Controllers
             }
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> GetHabitacionesPorBarco(int idBarco)
+        {
+            var habitaciones = await _serviceBarcoHabitaciones.HabitacionesPorBarcoAsync(idBarco);
+            return Json(habitaciones);
+        }
 
     }
 }
