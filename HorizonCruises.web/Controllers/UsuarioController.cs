@@ -76,8 +76,8 @@ namespace HorizonCruises.Web.Controllers
 
             await _serviceUsuario.AddAsync(dto);
 
-            TempData["Mensaje"] = "Usuario creado exitosamente. Ahora podés iniciar sesión.";
-            return RedirectToAction("Index", "Login");
+            TempData["SuccessMessage"] = "Cliente creado exitosamente."; // Guardamos el mensaje en TempData
+            return RedirectToAction("Index", "Login"); // Redirigimos a Login
         }
 
         public async Task<IActionResult> Details(int id)
