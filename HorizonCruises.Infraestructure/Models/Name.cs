@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace HorizonCruises.Infraestructure.Models
 {
-    public class Pais
+    public class Name
     {
-        public Name name { get; set; }
+        public string common { get; set; }
     }
 }

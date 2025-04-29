@@ -50,12 +50,11 @@ namespace HorizonCruises.Web.Controllers
         // Método para obtener la lista de países desde la API externa
         private async Task<List<string>> ObtenerListaPaisesDesdeAPI()
         {
-            var response = await _httpClient.GetStringAsync("https://restcountries.com/v3.1/all"); 
+            var response = await _httpClient.GetStringAsync("https://restcountries.com/v3.1/all");
             var countries = JsonConvert.DeserializeObject<List<Pais>>(response);
 
-            return countries.Select(c => c.Name).ToList(); 
+            return countries.Select(c => c.name.common).OrderBy(p => p).ToList();
         }
-
 
         // GET: UsuarioController/Create
         public async Task<IActionResult> Create()
