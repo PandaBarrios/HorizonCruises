@@ -10,6 +10,7 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
     public interface IRepositoryReserva
     {
         Task<ICollection<Reserva>> ListAsync();
+        Task<ICollection<Reserva>> ListAsyncCliente(int idUsuario);
         Task<Reserva> FindByIdAsync(int id);
         Task<Reserva> CreateAsync(Reserva reserva);
 

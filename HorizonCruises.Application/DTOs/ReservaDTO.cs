@@ -37,14 +37,15 @@ namespace HorizonCruises.Application.DTOs
         [DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = false)]
         public decimal Total { get; set; }
 
-        public virtual CruceroDTO IdCruceroNavigation { get; set; } = null!;
+        public virtual List<ReservaHabitacionDTO>? ReservaHabitacion { get; set; }
 
-        public virtual ClienteDTO IdUsuarioNavigation { get; set; } = null!;
+        public virtual List<ReservaComplementoDTO>? ReservaComplemento { get; set; }
 
-        public virtual List<ReservaComplementoDTO> ReservaComplemento { get; set; } = null!;
+        public virtual List<HuespedDTO>? IdHuesped { get; set; }
 
-        public virtual List<ReservaHabitacionDTO> ReservaHabitacion { get; set; } = null!;
+        public virtual CruceroDTO? IdCruceroNavigation { get; set; }
 
-        public virtual List<HuespedDTO> IdHuesped { get; set; } = null!;
+        public virtual ClienteDTO? IdUsuarioNavigation { get; set; }
+
     }
 }

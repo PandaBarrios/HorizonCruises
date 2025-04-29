@@ -1,4 +1,5 @@
 ﻿using HorizonCruises.Application.DTOs;
+using HorizonCruises.Infraestructure.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -55,5 +55,18 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                                               .ToListAsync();
             return collection;
         }
+
+        public async Task<ICollection<Reserva>> ListAsyncCliente(int idUsuario)
+        {
+            var collection = await _context.Set<Reserva>()
+                                           .Where(r => r.IdUsuario == idUsuario) 
+                                           .Include(r => r.IdUsuarioNavigation)  
+                                           .Include(r => r.IdCruceroNavigation)
+                                           .AsNoTracking()                     
+                                           .ToListAsync();
+
+            return collection;
+        }
+
     }
 }

@@ -1,0 +1,48 @@
+﻿@model IEnumerable<HorizonCruises.Application.DTOs.ItinerarioDTO>
+
+<div id="myCard">
+    <div class="card">
+        <div class="card-header">
+            Detalle del Itinerario
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered text-center" id="detalleItinerario">
+                    <thead>
+                        <tr>
+                            <th>Puerto</th> <!-- Mostrar solo el nombre del puerto -->
+                            <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+                            <th>@Html.DisplayNameFor(model => model.Orden)</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="puerto-nombre">@item.IdPuertoNavigation.Nombre</span>
+                                        <input type="hidden" name="Itinerario[@item.Orden].IdPuerto" value="@item.IdPuerto" />
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="Itinerario[@item.Orden].Descripcion" value="@item.Descripcion" />
+                                        @Html.DisplayFor(modelItem => item.Descripcion)
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="Itinerario[@item.Orden].Orden" value="@item.Orden" />
+                                        @Html.DisplayFor(modelItem => item.Orden)
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger" onclick="deleteItinerario(@item.Orden)">Eliminar</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

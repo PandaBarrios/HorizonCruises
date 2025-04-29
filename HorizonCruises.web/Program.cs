@@ -42,6 +42,10 @@ builder.Services.AddTransient<IRepositoryPrecioHabitacion, RepositoryPrecioHabit
 builder.Services.AddTransient<IRepositoryUsuarioHuesped, RepositoryUsuarioHuesped>();
 builder.Services.AddTransient<IRepositoryHuesped, RepostoryHuesped>();
 builder.Services.AddTransient<IRepositoryComplemento, RepositoryComplemento>();
+builder.Services.AddTransient<IRepositoryReservaHabitacion, RepositoryReservaHabitaciones>();
+builder.Services.AddTransient<IRepositoryReservaHuespedes, RepositoryReservaHuespedes>();
+builder.Services.AddTransient<IRepositoryReservaComplementos, RepositoryReservaComplemento>();
+
 builder.Services.AddTransient<IRepositoryTarjeta, RepositoryTarjeta>();
 
 //Services 
@@ -59,6 +63,9 @@ builder.Services.AddTransient<IServicePrecioHabitacion, ServicePrecioHabitacion>
 builder.Services.AddTransient<IServiceUsuarioHuesped, ServiceUsuarioHuesped>();
 builder.Services.AddTransient<IServiceHuesped, ServiceHuesped>();  
 builder.Services.AddTransient<IServiceComplemento, ServiceComplemento>();
+builder.Services.AddTransient<IServiceReservaHabitaciones, ServiceReservaHabitaciones>();
+builder.Services.AddTransient<IServiceReservaHuespedes, ServiceReservaHuespedes>();
+builder.Services.AddTransient<IServiceReservaComplementos, ServiceReservaComplementos>();
 builder.Services.AddTransient<IServiceTarjeta, ServiceTarjeta>();
 
 //Seguridad
@@ -94,6 +101,7 @@ builder.Services.AddAutoMapper(config =>
     config.AddProfile<TarjetaProfile>();
     config.AddProfile<TelefonoProfile>();
     config.AddProfile<UsuarioHuespedProfile>();
+    config.AddProfile<ReservaHuespedProfile>();
 });
 
 // Configuar Conexión a la Base de Datos SQL 
@@ -125,8 +133,10 @@ builder.Host.UseSerilog(logger);
 
 //Permite colocar el simbolo del colon de manera global
 var cultureInfo = new CultureInfo("es-CR");
+cultureInfo.NumberFormat.NumberDecimalSeparator = ".";
 CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 
 
 var app = builder.Build();
