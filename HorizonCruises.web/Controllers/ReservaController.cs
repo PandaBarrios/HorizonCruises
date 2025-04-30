@@ -227,17 +227,17 @@ namespace HorizonCruises.web.Controllers
                     }
                 }
 
-                if (huespedes != null)
-                {
-                    foreach (var h in huespedes)
-                    {
-                        await _serviceReservaHuespedes.CreateAsync(new ReservaHuespedDTO
-                        {
-                            IdReserva = idReserva,
-                            IdHuesped = h.Id
-                        });
-                    }
-                }
+                //if (huespedes != null)
+                //{
+                //    foreach (var h in huespedes)
+                //    {
+                //        await _serviceReservaHuespedes.CreateAsync(new ReservaHuespedDTO
+                //        {
+                //            IdReserva = idReserva,
+                //            IdHuesped = h.Id
+                //        });
+                //    }
+                //}
 
                 if (complementos != null)
                 {
