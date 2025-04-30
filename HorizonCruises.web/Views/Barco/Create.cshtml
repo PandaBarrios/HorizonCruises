@@ -12,8 +12,6 @@
         </div>
         <div class="card-body px-5 py-4">
             <form asp-action="Create" method="post">
-                <div asp-validation-summary="All" class="alert alert-danger"></div>
-
                 <!-- Nombre -->
                 <div class="mb-3">
                     <label asp-for="Nombre" class="form-label fw-bold"></label>
@@ -35,14 +33,10 @@
                     <span asp-validation-for="CapacidadHuespedes" class="text-danger"></span>
                 </div>
 
-                <!-- Habitaciones -->
-                <div class="mt-4 mb-3">
-                    <h5 class="fw-bold">Habitaciones</h5>
-                    <button type="button" class="btn btn-outline-success btn-sm mb-3" onclick="agregarHabitacion()">
-                        <i class="bi bi-plus-circle"></i> Agregar Habitación
-                    </button>
-                    <div id="habitacionesList"></div>
-                </div>
+        <!-- Habitaciones -->
+        <h4 class="mt-4">Habitaciones</h4>
+        <button type="button" class="btn btn-success btn-sm mb-3" onclick="agregarHabitacion()">Agregar Habitación</button>
+        <div id="habitacionesList"></div>
 
         <!-- Botón Guardar -->
         <div class="text-center mt-4">
@@ -52,13 +46,13 @@
     </form>
 </div>
 
-
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
         let index = 0;
 
+        // Lista completa de habitaciones desde el servidor
         const habitacionesDisponibles = [
         @foreach (var hab in habitacionesList)
         {
@@ -69,18 +63,15 @@
         function agregarHabitacion() {
             const container = document.getElementById("habitacionesList");
 
+            // Obtener valores de habitaciones ya seleccionadas
             const selects = document.querySelectorAll(".habitacion-select");
             const seleccionadas = Array.from(selects).map(s => s.value);
+
+            // Filtrar las habitaciones aún disponibles
             const disponibles = habitacionesDisponibles.filter(h => !seleccionadas.includes(h.value));
 
             if (disponibles.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Habitaciones',
-                    text: 'Ya no hay más habitaciones disponibles para agregar.',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'Entendido'
-                });
+                alert("Ya no hay más habitaciones disponibles para agregar.");
                 return;
             }
 
@@ -99,9 +90,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <input type="number" name="BarcoHabitaciones[${index}].TotalHabitacionesDisponibles"
-                        class="form-control cantidad-habitacion"
-                        placeholder="Total disponibles" min="1" required />
+                    <input type="number" name="BarcoHabitaciones[${index}].TotalHabitacionesDisponibles" class="form-control" placeholder="Total disponibles" min="1" required />
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-danger" onclick="eliminarHabitacion(this)">X</button>
@@ -112,87 +101,29 @@
             index++;
         }
 
+        // Eliminar fila de habitación y permitir volver a seleccionar esa opción
         function eliminarHabitacion(btn) {
             btn.closest('.row').remove();
         }
 
+        // Validación antes de enviar el formulario
         document.querySelector("form").addEventListener("submit", function (e) {
             const selects = document.querySelectorAll(".habitacion-select");
-            const cantidades = document.querySelectorAll(".cantidad-habitacion");
             const values = [];
-            let totalHabitaciones = 0;
 
-            const capacidadInput = document.getElementById("CapacidadHuespedes");
-            const capacidad = parseInt(capacidadInput?.value) || 0;
-
-            if (selects.length === 0) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Habitaciones',
-                    text: 'Debe agregar al menos una habitación.',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'Entendido'
-                });
-                return;
-            }
-
-            for (let i = 0; i < selects.length; i++) {
-                const value = selects[i].value;
-                const cantidad = parseInt(cantidades[i].value);
-
-                if (!value) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Habitación no seleccionada',
-                        text: 'Debe seleccionar una habitación en cada fila.',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
-                }
-
+            for (let select of selects) {
+                const value = select.value;
                 if (values.includes(value)) {
                     e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Habitación duplicada',
-                        text: 'No puedes seleccionar la misma habitación más de una vez.',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
+                    alert("No puedes seleccionar la misma habitación más de una vez.");
+                    return false;
                 }
-
-                if (!cantidad || cantidad < 1) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Cantidad inválida',
-                        text: 'La cantidad de habitaciones debe ser mayor a 0.',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
+                if (value) {
+                    values.push(value);
                 }
-
-                values.push(value);
-                totalHabitaciones += cantidad;
-            }
-
-            if (capacidad > 0 && totalHabitaciones > capacidad) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Capacidad excedida',
-                    text: `El total de habitaciones asignadas (${totalHabitaciones}) supera la capacidad máxima del barco (${capacidad}).`,
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'Entendido'
-                });
-                return;
             }
         });
     </script>
 }
-}
+
+
