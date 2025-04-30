@@ -27,6 +27,22 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             return entityEntry.Entity;
         }
 
+        public async Task<ICollection<Reserva>> FiltrarPorRangoFechaAsync(DateOnly fechaInicio, DateOnly fechaFinal)
+        {
+            var reservas = await _context.Reserva
+                .Where(r => r.FechaReserva >= fechaInicio && r.FechaReserva <= fechaFinal)
+                .Include(r => r.IdUsuarioNavigation)
+                .Include(r => r.IdCruceroNavigation)
+                .Include(r => r.ReservaHabitacion)
+                    .ThenInclude(rh => rh.IdHabitacionNavigation)
+                .Include(r => r.ReservaComplemento)
+                .Include(r => r.IdHuesped)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return reservas;
+        }
+
         public async Task<Reserva> FindByIdAsync(int id)
         {
             var reserva = await _context.Reserva

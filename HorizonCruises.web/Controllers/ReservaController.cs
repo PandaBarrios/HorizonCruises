@@ -52,12 +52,22 @@ namespace HorizonCruises.web.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> IndexReserva()
+        public async Task<IActionResult> IndexReserva(DateOnly? fechaInicio, DateOnly? fechaFinal)
         {
-            var collection = await _serviceReserva.ListAsync();
-            return View(collection);
+            ICollection<ReservaDTO> collection;
 
+            if (fechaInicio.HasValue && fechaFinal.HasValue)
+            {
+                collection = await _serviceReserva.FiltrarPorRangoFechaAsync(fechaInicio.Value, fechaFinal.Value);
+            }
+            else
+            {
+                collection = await _serviceReserva.ListAsync();
+            }
+
+            return View(collection);
         }
+
 
         [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> IndexReservaCliente(int idUsuario)

@@ -13,6 +13,6 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
         Task<ICollection<Reserva>> ListAsyncCliente(int idUsuario);
         Task<Reserva> FindByIdAsync(int id);
         Task<Reserva> CreateAsync(Reserva reserva);
-
+        Task<ICollection<Reserva>> FiltrarPorRangoFechaAsync(DateOnly fechaInicio, DateOnly fechaFinal);
     }
 }

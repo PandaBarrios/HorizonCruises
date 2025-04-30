@@ -14,5 +14,6 @@ namespace HorizonCruises.Application.Services.Interfaces
         Task<ICollection<ReservaDTO>> ListAsyncCliente(int idUsuario);
         Task<ReservaDTO> FindByIdAsync(int id);
         Task<ReservaDTO> CreateAsync(ReservaDTO reserva);
+        Task<ICollection<ReservaDTO>> FiltrarPorRangoFechaAsync(DateOnly fechaInicio, DateOnly fechaFinal);
     }
 }

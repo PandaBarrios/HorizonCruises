@@ -35,6 +35,13 @@ namespace HorizonCruises.Application.Services.Implementations
             return _mapper.Map<ReservaDTO>(entidadCreada);
         }
 
+        public async Task<ICollection<ReservaDTO>> FiltrarPorRangoFechaAsync(DateOnly fechaInicio, DateOnly fechaFinal)
+        {
+            var reservas = await _repository.FiltrarPorRangoFechaAsync(fechaInicio, fechaFinal);
+            var reservasDTO = _mapper.Map<ICollection<ReservaDTO>>(reservas);
+            return reservasDTO;
+        }
+
 
         public async Task<ReservaDTO> FindByIdAsync(int id)
         {
