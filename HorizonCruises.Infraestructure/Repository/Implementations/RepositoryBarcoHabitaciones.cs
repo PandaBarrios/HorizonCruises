@@ -77,5 +77,15 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                     .Select(bh => bh.IdHabitacionNavigation) 
                     .ToListAsync();
         }
+
+        public async Task RemoveByBarcoIdAsync(int barcoId)
+        {
+            var habitaciones = await _context.BarcoHabitaciones
+                .Where(bh => bh.IdBarco == barcoId)
+                .ToListAsync();
+
+            _context.BarcoHabitaciones.RemoveRange(habitaciones);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -4,59 +4,59 @@
     ViewData["Title"] = "Detalles del Barco";
 }
 
-<div class="container mt-4 pb-5">
-    <div class="card shadow-lg rounded">
-        <div class="card-header bg-primary text-white text-center">
-            <h3 class="mb-0">Detalles del Barco</h3>
+<div class="container mt-5 pb-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-gradient bg-primary text-white text-center rounded-top-4">
+            <h2 class="mb-0"><i class="bi bi-ship"></i> Detalles del Barco</h2>
         </div>
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-4 text-secondary fw-bold">
-                    @Html.DisplayNameFor(model => model.Nombre)
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.Nombre)
-                </dd>
-
-                <dt class="col-sm-4 text-secondary fw-bold">
-                    @Html.DisplayNameFor(model => model.Descripcion)
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.Descripcion)
-                </dd>
-
-                <dt class="col-sm-4 text-secondary fw-bold">
-                    @Html.DisplayNameFor(model => model.CapacidadHuespedes)
-                </dt>
-                <dd class="col-sm-8">
-                    @Html.DisplayFor(model => model.CapacidadHuespedes)
-                </dd>
-
-                <dt class="col-sm-4 text-secondary fw-bold">Habitaciones Disponibles</dt>
-                <dd class="col-sm-8">
-                    <ul class="list-group">
-                        @foreach (var habitacion in Model.BarcoHabitaciones)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                @habitacion.IdHabitacionNavigation.Nombre
-                                <span class="badge bg-primary rounded-pill">
-                                    @habitacion.TotalHabitacionesDisponibles disponibles
-                                </span>
-                            </li>
-                        }
-                    </ul>
-                </dd>
-            </dl>
-        </div>
-        <div class="card-footer text-center">
-            <div class="btn-group">
-                @* <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">
-                    <i class="bi bi-pencil-fill"></i> Editar
-                </a> *@
-                <a asp-action="Index" class="btn btn-secondary">
-                    <i class="bi bi-arrow-return-left"></i> Regresar
-                </a>
+        <div class="card-body p-4">
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold text-secondary">
+                    <i class="bi bi-tag-fill me-1"></i> @Html.DisplayNameFor(model => model.Nombre)
+                </div>
+                <div class="col-md-8">
+                    <span class="fs-5">@Html.DisplayFor(model => model.Nombre)</span>
+                </div>
             </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4 fw-semibold text-secondary">
+                    <i class="bi bi-card-text me-1"></i> @Html.DisplayNameFor(model => model.Descripcion)
+                </div>
+                <div class="col-md-8">
+                    <span>@Html.DisplayFor(model => model.Descripcion)</span>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4 fw-semibold text-secondary">
+                    <i class="bi bi-people-fill me-1"></i> @Html.DisplayNameFor(model => model.CapacidadHuespedes)
+                </div>
+                <div class="col-md-8">
+                    <span class="fs-5">@Html.DisplayFor(model => model.CapacidadHuespedes) personas</span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="text-primary"><i class="bi bi-door-open-fill me-1"></i> Habitaciones Disponibles</h5>
+                <ul class="list-group list-group-flush border rounded-3 shadow-sm">
+                    @foreach (var habitacion in Model.BarcoHabitaciones)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>@habitacion.IdHabitacionNavigation.Nombre</span>
+                            <span class="badge bg-success fs-6">
+                                @habitacion.TotalHabitacionesDisponibles disponibles
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-footer text-center bg-light border-top-0 rounded-bottom-4 py-3">
+            <a asp-action="IndexAdmin" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-arrow-left-circle me-1"></i> Volver a la lista
+            </a>
         </div>
     </div>
 </div>

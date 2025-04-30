@@ -62,5 +62,10 @@ namespace HorizonCruises.Application.Services.Implementations
         {
             await _repository.UpdateAsync(idBarco, idHabitacion, disponibles);
         }
+
+        public async Task RemoveByBarcoIdAsync(int barcoId)
+        {
+            await _repository.RemoveByBarcoIdAsync(barcoId);
+        }
     }
 }
