@@ -48,7 +48,7 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
                 .ToListAsync();
         }
 
-        public async Task UpdateAsync(int idBarco, int idHabitacion, int disponibles)
+        public async Task UpdateAsync(int idBarco, int idHabitacion, int cantidadARestar)
         {
             var entity = await _context.BarcoHabitaciones
                 .FirstOrDefaultAsync(bh => bh.IdBarco == idBarco && bh.IdHabitacion == idHabitacion);
@@ -56,9 +56,13 @@ namespace HorizonCruises.Infraestructure.Repository.Implementations
             if (entity == null)
                 throw new Exception("Relación Barco-Habitación no encontrada.");
 
-            entity.TotalHabitacionesDisponibles = disponibles;
+            if (entity.TotalHabitacionesDisponibles < cantidadARestar)
+                throw new InvalidOperationException("No hay suficientes habitaciones disponibles para restar.");
+
+            entity.TotalHabitacionesDisponibles -= cantidadARestar;
             await _context.SaveChangesAsync();
         }
+
 
         public async Task<BarcoHabitaciones> GetHabitacionPorId(int id)
         {

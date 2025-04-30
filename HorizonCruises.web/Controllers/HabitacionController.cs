@@ -1,6 +1,7 @@
 ﻿using HorizonCruises.Application.DTOs;
 using HorizonCruises.Application.Services.Implementations;
 using HorizonCruises.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
@@ -19,11 +20,13 @@ namespace HorizonCruises.web.Controllers
 
         [HttpGet]
         // GET: HabitacionController
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<ActionResult> Index()
         {
             var collection = await _serviceHabitacion.ListAsync();
             return View(collection);
         }
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> IndexAdmin()
         {
             var collection = await _serviceHabitacion.ListAsync();
@@ -31,6 +34,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         // GET: HabitacionController/Details/5
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<ActionResult> Details(int id)
         {
             var @object = await _serviceHabitacion.FindByIdAsync(id);
@@ -38,6 +42,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         // GET: HabitacionController/Create
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Create()
         {
             return View();
@@ -45,6 +50,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create(HabitacionDTO dto)
         {
             // Validación del modelo
@@ -83,6 +89,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         // GET: HabitacionController/Edit/5
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var habitacion = await _serviceHabitacion.FindByIdAsync(id);
@@ -98,6 +105,7 @@ namespace HorizonCruises.web.Controllers
         // POST: HabitacionController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id, HabitacionDTO dto)
         {
             if (!ModelState.IsValid)

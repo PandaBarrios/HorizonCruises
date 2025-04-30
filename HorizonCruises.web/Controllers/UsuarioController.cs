@@ -26,6 +26,7 @@ namespace HorizonCruises.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Index()
         {
             var collection = await _serviceUsuario.ListAsync();
@@ -86,6 +87,7 @@ namespace HorizonCruises.Web.Controllers
             return View(@object);
         }
 
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var @object = await _serviceUsuario.FindByIdAsync(id);
@@ -94,12 +96,14 @@ namespace HorizonCruises.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Edit(int id, ClienteDTO dto)
         {
             await _serviceUsuario.UpdateAsync(id, dto);
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Delete(int id)
         {
             var @object = await _serviceUsuario.FindByIdAsync(id);
@@ -108,6 +112,7 @@ namespace HorizonCruises.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
             await _serviceUsuario.DeleteAsync(id);
