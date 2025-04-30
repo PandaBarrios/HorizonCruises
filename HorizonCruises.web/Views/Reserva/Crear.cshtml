@@ -182,6 +182,11 @@
                 }
             </tbody>
         </table>
+        <div>
+            <a asp-controller="Huesped" asp-action="HuspedIndex" class="btn btn-primary">
+                Agregar acompañantes
+            </a>
+        </div>
     </div>
 
     <div id="alerta-huesped" class="alert alert-warning alert-dismissible fade show d-none" role="alert">
@@ -304,10 +309,6 @@
     <input type="hidden" id="TotalHabitaciones" />
 
     <div class="text-end mt-2">
-        <h5>Total huéspedes: <span id="contador-huespedes">0</span></h5>
-        <h5>Total habitaciones: <span id="contador-habitaciones">0</span></h5>
-        <h5>Total complementos por huéspedes: <span id="total-complementos-huespedes">₡0.00</span></h5>
-        <h5>Total complementos por habitaciones: <span id="total-complementos-habitaciones">₡0.00</span></h5>
         <h5>Total complementos: <span id="total-complementos">₡0.00</span></h5>
     </div>
 
@@ -327,6 +328,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
+
+                    <div id="totalPagoEnGrande" class="text-center fw-bold fs-1 text-success mb-3"></div>
+
                     <div class="mb-3">
                         <label class="form-label">Método de pago:</label>
                         <select class="form-select" id="metodoPago">
@@ -837,6 +841,7 @@
             document.getElementById('pagoMinimo').textContent = `₡${pagoMin.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             document.getElementById('pagoMaximo').textContent = `₡${pagoMax.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
             document.getElementById('pagoSeleccionado').textContent = `₡${slider.value.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('totalPagoEnGrande').textContent = `₡${total.toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;
 
             slider.addEventListener('input', () => {
                 document.getElementById('pagoSeleccionado').textContent = `₡${parseFloat(slider.value).toLocaleString('es-CR', { minimumFractionDigits: 2 })}`;

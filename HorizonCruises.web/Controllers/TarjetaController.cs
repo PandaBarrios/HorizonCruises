@@ -22,6 +22,7 @@ namespace HorizonCruises.web.Controllers
 
 
         // Acción Index para mostrar solo las tarjetas del usuario logueado
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Index()
         {
             // Obtener el IdUsuario desde el claim
@@ -44,6 +45,7 @@ namespace HorizonCruises.web.Controllers
             return View(tarjetas);
         }
 
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Details(int id)
         {
             var tarjeta = await _serviceTarjeta.FindByIdAsync(id);
@@ -57,6 +59,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Create(TarjetaDTO tarjeta)
         {
             // Verificar que el usuario está logueado antes de intentar obtener el IdUsuario
@@ -91,6 +94,7 @@ namespace HorizonCruises.web.Controllers
             }
         }
 
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var tarjeta = await _serviceTarjeta.FindByIdAsync(id);
@@ -99,6 +103,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> Edit(int id, TarjetaDTO dto)
         {
             if (!ModelState.IsValid) return View(dto);

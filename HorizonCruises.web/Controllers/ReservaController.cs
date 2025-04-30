@@ -220,24 +220,24 @@ namespace HorizonCruises.web.Controllers
                         };
 
                         await _serviceReservaHabitacion.CreateAsync(reservaDTO);
-                        //await _serviceBarcoHabitaciones.UpdateAsync(
-                        //    nuevaReserva.IdCruceroNavigation.IdBarco,
-                        //    idHabitacion,
-                        //    h.Cantidad);
+                        await _serviceBarcoHabitaciones.UpdateAsync(
+                            nuevaReserva.IdCruceroNavigation.IdBarco,
+                            idHabitacion,
+                            h.Cantidad);
                     }
                 }
 
-                if (huespedes != null)
-                {
-                    foreach (var h in huespedes)
-                    {
-                        await _serviceReservaHuespedes.CreateAsync(new ReservaHuespedDTO
-                        {
-                            IdReserva = idReserva,
-                            IdHuesped = h.Id
-                        });
-                    }
-                }
+                //if (huespedes != null)
+                //{
+                //    foreach (var h in huespedes)
+                //    {
+                //        await _serviceReservaHuespedes.CreateAsync(new ReservaHuespedDTO
+                //        {
+                //            IdReserva = idReserva,
+                //            IdHuesped = h.Id
+                //        });
+                //    }
+                //}
 
                 if (complementos != null)
                 {

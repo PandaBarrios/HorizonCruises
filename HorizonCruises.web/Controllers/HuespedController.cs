@@ -2,6 +2,7 @@
 using HorizonCruises.Application.Services.Implementations;
 using HorizonCruises.Application.Services.Interfaces;
 using HorizonCruises.web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HorizonCruises.web.Controllers
@@ -19,7 +20,7 @@ namespace HorizonCruises.web.Controllers
             _logger = logger;
         }
 
-
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> HuspedIndex()
         {
             if (!int.TryParse(User.FindFirst("IdUsuario")?.Value, out int idUsuario))
@@ -29,6 +30,7 @@ namespace HorizonCruises.web.Controllers
             return View(collection);
         }
 
+        [Authorize(Roles = "Cliente")]
         public IActionResult Crear()
         {
             return View();
@@ -36,6 +38,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Cliente")]
         public async Task<IActionResult> Create(ViewModelHuesped model)
         {
             if (!ModelState.IsValid)

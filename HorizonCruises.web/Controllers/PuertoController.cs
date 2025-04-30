@@ -1,4 +1,5 @@
 ﻿using HorizonCruises.Application.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HorizonCruises.web.Controllers
@@ -11,7 +12,7 @@ namespace HorizonCruises.web.Controllers
         {
             _servicePurto = serviceCrucero;
         }
-
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> PuertoIndex()
         {
             var collection = await _servicePurto.ListAsync();

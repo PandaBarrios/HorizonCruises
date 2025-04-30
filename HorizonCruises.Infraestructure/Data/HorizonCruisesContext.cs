@@ -39,7 +39,7 @@ public partial class HorizonCruisesContext : DbContext
     public virtual DbSet<ReservaComplemento> ReservaComplemento { get; set; }
 
     public virtual DbSet<ReservaHabitacion> ReservaHabitacion { get; set; }
-
+    //public virtual DbSet<ReservaHuesped> ReservaHuesped { get; set; }
     public virtual DbSet<Rol> Rol { get; set; }
 
     public virtual DbSet<Tarjeta> Tarjeta { get; set; }
@@ -347,6 +347,27 @@ public partial class HorizonCruisesContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Reserva_Habitacion_Reserva");
         });
+
+        //modelBuilder.Entity<ReservaHuesped>(entity =>
+        //{
+        //    entity.ToTable("Reserva_Huesped");
+
+        //    entity.HasKey(e => new { e.IdReserva, e.IdHuesped });
+
+        //    entity.Property(e => e.IdReserva).HasColumnName("Id_reserva");
+        //    entity.Property(e => e.IdHuesped).HasColumnName("Id_huesped");
+
+        //    entity.HasOne(e => e.IdReservaNavigation)
+        //        .WithMany(r => r.ReservaHuesped)
+        //        .HasForeignKey(e => e.IdReserva)
+        //        .OnDelete(DeleteBehavior.Cascade);
+
+        //    entity.HasOne(e => e.IdHuespedNavigation)
+        //        .WithMany(h => h.ReservaHuesped)
+        //        .HasForeignKey(e => e.IdHuesped)
+        //        .OnDelete(DeleteBehavior.Cascade);
+        //});
+
 
         modelBuilder.Entity<Rol>(entity =>
         {

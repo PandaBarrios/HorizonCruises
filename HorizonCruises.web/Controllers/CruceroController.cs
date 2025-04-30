@@ -2,6 +2,7 @@
 using HorizonCruises.Application.Services.Implementations;
 using HorizonCruises.Application.Services.Interfaces;
 using HorizonCruises.Infraestructure.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Globalization;
@@ -34,12 +35,13 @@ namespace HorizonCruises.web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> CruceroIndex()
         {
             var collection = await _serviceCrucero.ListAsync();
             return View(collection);
         }
-
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<ActionResult> CruceroDetails(int? id)
         {
             try
@@ -63,6 +65,7 @@ namespace HorizonCruises.web.Controllers
                 throw new Exception(ex.Message);
             }
         }
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> DetailsAdmin(int? id)
         {
             if (id == null)
@@ -91,6 +94,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> ObtenerImagen(int id)
         {
             var crucero = await _serviceCrucero.FindByIdAsync(id);
@@ -104,6 +108,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         //Mantenimiento Crucero
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> IndexAdmin()
         {
             var collection = await _serviceCrucero.ListAsync();
@@ -111,6 +116,7 @@ namespace HorizonCruises.web.Controllers
         }
 
         // GET: CruceroController/Create
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create()
         {
             ViewBag.ListBarco = await _serviceBarco.ListAsync();
@@ -121,6 +127,7 @@ namespace HorizonCruises.web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Create(CruceroDTO cruceroDTO,
                                          IFormFile ImageFile,
                                          string itinerarioJson,
@@ -237,6 +244,7 @@ namespace HorizonCruises.web.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Cliente, Administrador")]
         public async Task<IActionResult> GetHabitacionesPorBarco(int idBarco)
         {
             var habitaciones = await _serviceBarcoHabitaciones.HabitacionesPorBarcoAsync(idBarco);

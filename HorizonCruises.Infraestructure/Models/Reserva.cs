@@ -26,7 +26,7 @@ public partial class Reserva
     public virtual Crucero? IdCruceroNavigation { get; set; }
 
     public virtual Usuario? IdUsuarioNavigation { get; set; }
-
+    //public virtual ICollection<ReservaHuesped> ReservaHuesped { get; set; } = new List<ReservaHuesped>();
     public virtual ICollection<ReservaComplemento> ReservaComplemento { get; set; } = new List<ReservaComplemento>();
 
     public virtual ICollection<ReservaHabitacion> ReservaHabitacion { get; set; } = new List<ReservaHabitacion>();
