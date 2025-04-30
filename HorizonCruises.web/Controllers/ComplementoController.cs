@@ -65,7 +65,7 @@ namespace HorizonCruises.web.Controllers
 
                 await _serviceComplemento.AddAsync(dto);
 
-                TempData["Mensaje"] = "Complemento creado con éxito";
+                TempData["SuccessMessage"] = "Complemento creado con éxito";
 
                 return RedirectToAction("IndexAdmin");
             }
@@ -129,7 +129,7 @@ namespace HorizonCruises.web.Controllers
 
                 await _serviceComplemento.UpdateAsync(dto.Id, dto);
 
-                TempData["Mensaje"] = "Complemento actualizado con éxito";
+                TempData["SuccessMessage"] = "Complemento actualizado con éxito";
 
                 return RedirectToAction("IndexAdmin");
             }

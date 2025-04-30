@@ -114,7 +114,6 @@ namespace HorizonCruises.web.Controllers
             return View(barco);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrador")]
@@ -123,45 +122,56 @@ namespace HorizonCruises.web.Controllers
             if (id != barcoDTO.Id)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var barco = await _serviceBarco.FindByIdAsync(id);
-
-                if (barco == null)
-                    return NotFound();
-
-                barco.BarcoHabitaciones.Clear();
-
-                var habitaciones = JsonSerializer.Deserialize<List<BarcoHabitacionesDTO>>(habitacionesJson);
-
-                if (habitaciones != null)
-                {
-                    foreach (var habitacion in habitaciones)
-                    {
-                        barco.BarcoHabitaciones.Add(new BarcoHabitaciones
-                        {
-                            IdBarco = barco.Id,
-                            IdHabitacion = habitacion.IdHabitacion,
-                            TotalHabitacionesDisponibles = habitacion.TotalHabitacionesDisponibles
-                        });
-                    }
-                }
-
-                barco.Nombre = barcoDTO.Nombre;
-                barco.Descripcion = barcoDTO.Descripcion;
-                barco.CapacidadHuespedes = barcoDTO.CapacidadHuespedes;
-
-                var result = await _serviceBarco.UpdateAsync(barco);
-
-                if (!result)
-                    return BadRequest("No se pudo actualizar el barco.");
-
-                return RedirectToAction(nameof(Index));
+                ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
+                return View(barcoDTO);
             }
 
-            ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
-            return View(barcoDTO);
-        }
+            var barco = await _serviceBarco.FindByIdAsync(id);
+            if (barco == null)
+                return NotFound();
 
+            // ✅ 1. Eliminar relaciones antiguas de habitaciones
+            await _serviceBarcoHabitacion.RemoveByBarcoIdAsync(barco.Id);
+
+            // ✅ 2. Agregar nuevas habitaciones desde JSON
+            var habitaciones = JsonSerializer.Deserialize<List<BarcoHabitacionesDTO>>(habitacionesJson);
+            if (habitaciones != null && habitaciones.Any())
+            {
+                barco.BarcoHabitaciones = new List<BarcoHabitaciones>();
+
+                foreach (var habitacion in habitaciones)
+                {
+                    barco.BarcoHabitaciones.Add(new BarcoHabitaciones
+                    {
+                        IdBarco = barco.Id,
+                        IdHabitacion = habitacion.IdHabitacion,
+                        TotalHabitacionesDisponibles = habitacion.TotalHabitacionesDisponibles
+                    });
+                }
+            }
+            else
+            {
+                barco.BarcoHabitaciones = new List<BarcoHabitaciones>(); // ← Asegura que no quede nulo
+            }
+
+            // ✅ 3. Actualizar datos del barco
+            barco.Nombre = barcoDTO.Nombre;
+            barco.Descripcion = barcoDTO.Descripcion;
+            barco.CapacidadHuespedes = barcoDTO.CapacidadHuespedes;
+
+            // ✅ 4. Ejecutar la actualización
+            var result = await _serviceBarco.UpdateAsync(barco);
+            if (!result)
+            {
+                ModelState.AddModelError("", "No se pudo actualizar el barco.");
+                ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
+                return View(barcoDTO);
+            }
+
+            // ✅ 5. Redirigir
+            return RedirectToAction(nameof(IndexAdmin));
+        }
     }
 }

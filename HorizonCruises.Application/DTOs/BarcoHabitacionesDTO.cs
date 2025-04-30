@@ -20,13 +20,7 @@ namespace HorizonCruises.Application.DTOs
         [Display(Name = "Total de Habitaciones Disponibles")]
         public int? TotalHabitacionesDisponibles { get; set; }
 
-        [JsonIgnore]
-        [BindNever] 
-        public HabitacionDTO IdHabitacionNavigation { get; set; } 
-
-        [JsonIgnore]
-        [BindNever]
-        public BarcoDTO IdBarcoNavigation { get; set; }
-
+        public HabitacionDTO? IdHabitacionNavigation { get; set; }
+        public BarcoDTO? IdBarcoNavigation { get; set; }
     }
 }

@@ -4,6 +4,30 @@
     ViewData["Title"] = "Administrar Complementos";
 }
 
+<style>
+    .custom-alert {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #f0fdf4;
+        color: #065f46;
+        padding: 15px 20px;
+        border-left: 5px solid #10b981;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        font-weight: 500;
+        transition: opacity 0.5s ease;
+    }
+
+        .custom-alert i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            vertical-align: middle;
+        }
+</style>
+
 <div class="container mt-4">
     <h1 class="mb-4 text-center">Administrar Complementos</h1>
 
@@ -40,5 +64,23 @@
             }
         </tbody>
     </table>
+    <!-- Notificación de éxito si existe -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div id="customSuccess" class="custom-alert">
+            <i class="bi bi-check-circle-fill"></i>
+            @TempData["SuccessMessage"]
+        </div>
+
+        <script>
+            setTimeout(function () {
+                document.getElementById("customSuccess").style.opacity = '0';
+            }, 2500); // Se desvanece antes de redirigir
+
+            setTimeout(function () {
+                window.location.href = "@Url.Action("IndexAdmin")";
+            }, 3000); // Redirige
+        </script>
+    }
 </div>
 

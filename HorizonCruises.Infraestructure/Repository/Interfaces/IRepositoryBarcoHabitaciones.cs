@@ -14,6 +14,8 @@ namespace HorizonCruises.Infraestructure.Repository.Interfaces
         Task<ICollection<BarcoHabitaciones>> GetHabitacionesByBarcoAsync(int idBarco);
         Task UpdateAsync(int idBarco, int idHabitacion, int disponibles);
         Task<BarcoHabitaciones> GetHabitacionPorId(int id);
+        Task RemoveByBarcoIdAsync(int barcoId);
+
 
         Task<ICollection<Habitacion>> HabitacionesPorBarcoAsync(int idBarco);
 

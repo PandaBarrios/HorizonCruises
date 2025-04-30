@@ -141,7 +141,23 @@
     function eliminarHabitacion(button) {
         button.closest(".habitacion-item").remove(); // Elimina el contenedor de la habitación
     }
+     // Antes de enviar el formulario, convertimos las habitaciones en JSON
+    document.querySelector("form").addEventListener("submit", function (e) {
+        let habitaciones = [];
+        let items = document.querySelectorAll(".habitacion-item");
 
+        items.forEach(function (item) {
+            let idHabitacion = item.querySelector("select").value;
+            let total = item.querySelector("input[type='number']").value;
+
+            habitaciones.push({
+                IdHabitacion: parseInt(idHabitacion),
+                TotalHabitacionesDisponibles: parseInt(total)
+            });
+        });
+
+        document.getElementById("habitacionesJson").value = JSON.stringify(habitaciones);
+    });
 </script>
 
 <script>
