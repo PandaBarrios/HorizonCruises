@@ -12,12 +12,15 @@ namespace HorizonCruises.Application.DTOs
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
         [Display(Name = "Nombre")]
         public string? Nombre { get; set; }
 
+        [Required(ErrorMessage = "La descripción es obligatorio.")]
         [Display(Name = "Descripción")]
         public string? Descripcion { get; set; }
 
+        [Required(ErrorMessage = "Debe indicar la capacidad de huéspedes.")]
         [Display(Name = "Capacidad de Huéspedes")]
         public int? CapacidadHuespedes { get; set; }
         public virtual ICollection<BarcoHabitaciones> BarcoHabitaciones { get; set; } = new List<BarcoHabitaciones>();
