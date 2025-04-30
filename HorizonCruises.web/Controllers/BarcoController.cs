@@ -89,6 +89,7 @@ namespace HorizonCruises.web.Controllers
                 return View(dto);
             }
 
+            TempData["SuccessMessage"] = "¡Barco creado exitosamente!";
             return RedirectToAction(nameof(IndexAdmin));
         }
 
@@ -169,6 +170,9 @@ namespace HorizonCruises.web.Controllers
                 ViewBag.Habitaciones = await _serviceHabitacion.ListAsync();
                 return View(barcoDTO);
             }
+
+            // ✅ 5. Agregar mensaje de éxito a TempData
+            TempData["SuccessMessage"] = "Barco actualizado exitosamente";
 
             // ✅ 5. Redirigir
             return RedirectToAction(nameof(IndexAdmin));
